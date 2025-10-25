@@ -220,6 +220,19 @@ function M.setup()
     DiagnosticWarn = { fg = c.yellow },
     DiagnosticInfo = { fg = c.blue },
     DiagnosticHint = { fg = c.cyan },
+
+    -- HTML Template Literals
+    javaScriptStringT = { fg = c.yellow },
+    htmlTag = { fg = c.magenta },
+    htmlTagName = { fg = c.blue },
+    htmlArg = { fg = c.orange },
+    htmlString = { fg = c.cyan },
+    htmlSpecialChar = { fg = c.magenta },
+    htmlEndTag = { fg = c.magenta },
+    htmlLink = { fg = c.blue, underline = true },
+    htmlBold = { bold = true },
+    htmlItalic = { italic = true },
+    htmlUnderline = { underline = true },
     
     -- Treesitter
     ["@comment"] = { fg = c.fg2, italic = true },
@@ -290,6 +303,31 @@ function M.setup()
   for group, opts in pairs(highlights) do
     vim.api.nvim_set_hl(0, group, opts)
   end
+
+      -- Link HTML groups to template literal groups
+vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTag", { link = "htmlTag" })
+vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTagName", { link = "htmlTagName" })
+vim.api.nvim_set_hl(0, "javaScriptStringT.htmlArg", { link = "htmlArg" })
+vim.api.nvim_set_hl(0, "javaScriptStringT.htmlString", { link = "htmlString" })
+vim.api.nvim_set_hl(0, "javaScriptStringT.htmlSpecialChar", { link = "htmlSpecialChar" })
+vim.api.nvim_set_hl(0, "javaScriptStringT.htmlEndTag", { link = "htmlEndTag" })
+
+  -- Direct highlighting for HTML in template literals (fallback approach)
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTag", { fg = c.magenta })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTagName", { fg = c.blue })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlArg", { fg = c.orange })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlString", { fg = c.cyan })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlSpecialChar", { fg = c.magenta })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlEndTag", { fg = c.magenta })
+  
+  -- Additional manual highlighting for template literals
+  vim.api.nvim_set_hl(0, "javaScriptStringT", { fg = c.cyan, bg = c.bg1 })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTag", { fg = c.magenta, bold = true })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTagName", { fg = c.blue, bold = true })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlArg", { fg = c.orange })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlString", { fg = c.cyan })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlSpecialChar", { fg = c.magenta })
+  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlEndTag", { fg = c.magenta, bold = true })
   
   -- Set colorscheme name
   vim.g.colors_name = "solarized"
