@@ -304,22 +304,6 @@ function M.setup()
     vim.api.nvim_set_hl(0, group, opts)
   end
 
-      -- Link HTML groups to template literal groups
-vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTag", { link = "htmlTag" })
-vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTagName", { link = "htmlTagName" })
-vim.api.nvim_set_hl(0, "javaScriptStringT.htmlArg", { link = "htmlArg" })
-vim.api.nvim_set_hl(0, "javaScriptStringT.htmlString", { link = "htmlString" })
-vim.api.nvim_set_hl(0, "javaScriptStringT.htmlSpecialChar", { link = "htmlSpecialChar" })
-vim.api.nvim_set_hl(0, "javaScriptStringT.htmlEndTag", { link = "htmlEndTag" })
-
-  -- Direct highlighting for HTML in template literals (fallback approach)
-  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTag", { fg = c.magenta })
-  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTagName", { fg = c.blue })
-  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlArg", { fg = c.orange })
-  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlString", { fg = c.cyan })
-  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlSpecialChar", { fg = c.magenta })
-  vim.api.nvim_set_hl(0, "javaScriptStringT.htmlEndTag", { fg = c.magenta })
-  
   -- Additional manual highlighting for template literals
   vim.api.nvim_set_hl(0, "javaScriptStringT", { fg = c.cyan, bg = c.bg1 })
   vim.api.nvim_set_hl(0, "javaScriptStringT.htmlTag", { fg = c.magenta, bold = true })

@@ -52,3 +52,7 @@ opt.updatetime = 50
 
 -- colorcolumn
 opt.colorcolumn = "80"
+
+-- leader key
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "

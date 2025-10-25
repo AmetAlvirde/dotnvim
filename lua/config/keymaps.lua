@@ -84,3 +84,35 @@ keymap("i", "<C-y>a", "<Plug>(emmet-anchorize-url)", { desc = "Anchorize URL" })
 keymap("i", "<C-y>A", "<Plug>(emmet-anchorize-summary)", { desc = "Anchorize summary" })
 keymap("i", "<C-y>m", "<Plug>(emmet-merge-lines)", { desc = "Merge lines" })
 keymap("i", "<C-y>c", "<Plug>(emmet-code-pretty)", { desc = "Pretty code" })
+
+-- ===================================================
+-- File Explorer Keymaps
+-- ===================================================
+
+-- Neo-tree toggle (right side)
+keymap("n", "<leader>e", "<cmd>Neotree filesystem toggle right<cr>", { desc = "Toggle Neo-tree (right side)" })
+
+-- Oil.nvim file explorer
+keymap("n", "<leader>o", "<cmd>Oil<cr>", { desc = "Open Oil file explorer" })
+
+-- ===================================================
+-- Telescope Keymaps
+-- ===================================================
+
+-- Find files in current directory
+keymap("n", "<leader>ff", function()
+  require("telescope.builtin").find_files()
+end, { desc = "Find files in current directory" })
+
+-- Find files in git project root
+keymap("n", "<leader>fp", function()
+  require("telescope.builtin").git_files()
+end, { desc = "Find files in git project root" })
+
+-- Go to last buffer (buffers with most recent first)
+keymap("n", "<leader>fl", function()
+  require("telescope.builtin").buffers({
+    sort_mru = true,
+    ignore_current_buffer = true,
+  })
+end, { desc = "Go to last buffer" })
