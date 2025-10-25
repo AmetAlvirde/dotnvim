@@ -109,10 +109,23 @@ keymap("n", "<leader>fp", function()
   require("telescope.builtin").git_files()
 end, { desc = "Find files in git project root" })
 
--- Go to last buffer (buffers with most recent first)
+-- Go to last buffer (immediately switch to most recently used buffer)
 keymap("n", "<leader>fl", function()
-  require("telescope.builtin").buffers({
-    sort_mru = true,
-    ignore_current_buffer = true,
-  })
+  -- Get all loaded buffers
+  local buffers = vim.tbl_filter(function(buf)
+    return vim.api.nvim_buf_is_loaded(buf) and vim.bo[buf].buflisted
+  end, vim.api.nvim_list_bufs())
+  
+  -- Sort by most recently used (higher number = more recent)
+  table.sort(buffers, function(a, b)
+    return vim.fn.getbufinfo(a)[1].lastused > vim.fn.getbufinfo(b)[1].lastused
+  end)
+  
+  -- Switch to the most recently used buffer (excluding current)
+  for _, buf in ipairs(buffers) do
+    if buf ~= vim.api.nvim_get_current_buf() then
+      vim.api.nvim_set_current_buf(buf)
+      break
+    end
+  end
 end, { desc = "Go to last buffer" })

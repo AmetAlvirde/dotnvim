@@ -316,6 +316,188 @@ return {
   },
 
   -- ===================================================
+  -- LSP (Language Server Protocol) Plugins
+  -- ===================================================
+
+  -- mason.nvim: LSP server installer and manager
+  {
+    "williamboman/mason.nvim",
+    lazy = false,
+    priority = 100,
+    config = function()
+      require("mason").setup({
+        ui = {
+          border = "rounded",
+          icons = {
+            package_installed = "✓",
+            package_pending = "➜",
+            package_uninstalled = "✗"
+          }
+        }
+      })
+    end,
+  },
+
+  -- nvim-lspconfig: Core LSP configuration plugin
+  {
+    "neovim/nvim-lspconfig",
+    lazy = false,
+    dependencies = {
+      "williamboman/mason.nvim",
+    },
+    config = function()
+      -- Using modern vim.lsp.config API (Neovim 0.11+)
+      -- This will be expanded in later phases with LSP keybindings and server configurations
+      
+      -- Configure ts_ls (TypeScript/JavaScript language server)
+      vim.lsp.config('ts_ls', {
+        cmd = { 'typescript-language-server', '--stdio' },
+        filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' },
+        root_markers = { 'package.json', 'tsconfig.json', 'jsconfig.json', '.git' },
+      })
+      
+      -- Enable ts_ls
+      vim.lsp.enable('ts_ls')
+    end,
+  },
+
+  -- ===================================================
+  -- Completion Plugins
+  -- ===================================================
+
+  -- LuaSnip: Snippet engine
+  {
+    "L3MON4D3/LuaSnip",
+    version = "v2.*",
+    build = "make install_jsregexp",
+    dependencies = {
+      "rafamadriz/friendly-snippets",
+    },
+    config = function()
+      require("luasnip.loaders.from_vscode").lazy_load()
+    end,
+  },
+
+  -- friendly-snippets: Collection of useful snippets
+  {
+    "rafamadriz/friendly-snippets",
+  },
+
+  -- nvim-cmp: Completion engine
+  {
+    "hrsh7th/nvim-cmp",
+    event = "InsertEnter",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+    },
+    config = function()
+      local cmp = require("cmp")
+      local luasnip = require("luasnip")
+
+      cmp.setup({
+        snippet = {
+          expand = function(args)
+            luasnip.lsp_expand(args.body)
+          end,
+        },
+        mapping = cmp.mapping.preset.insert({
+          ["<C-n>"] = cmp.mapping.select_next_item(),
+          ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+          ["<C-f>"] = cmp.mapping.scroll_docs(4),
+          ["<C-Space>"] = cmp.mapping.complete(),
+          ["<C-y>"] = cmp.mapping.complete(), -- Alternative to <C-Space> for terminal compatibility
+          ["<C-e>"] = cmp.mapping.abort(),
+          ["<CR>"] = cmp.mapping.confirm({ select = true }),
+          ["<Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_next_item()
+            elseif luasnip.expand_or_jumpable() then
+              luasnip.expand_or_jump()
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+          ["<S-Tab>"] = cmp.mapping(function(fallback)
+            if cmp.visible() then
+              cmp.select_prev_item()
+            elseif luasnip.jumpable(-1) then
+              luasnip.jump(-1)
+            else
+              fallback()
+            end
+          end, { "i", "s" }),
+        }),
+        sources = cmp.config.sources({
+          { name = "nvim_lsp" },
+          { name = "luasnip" },
+          { name = "path" },
+        }, {
+          { name = "buffer" },
+        }),
+        formatting = {
+          format = function(entry, vim_item)
+            -- Add source name to completion items
+            vim_item.menu = ({
+              nvim_lsp = "[LSP]",
+              luasnip = "[Snippet]",
+              buffer = "[Buffer]",
+              path = "[Path]",
+            })[entry.source.name]
+            return vim_item
+          end,
+        },
+      })
+    end,
+  },
+
+  -- cmp-nvim-lsp: LSP completion source
+  {
+    "hrsh7th/cmp-nvim-lsp",
+  },
+
+  -- cmp-buffer: Buffer text completion source
+  {
+    "hrsh7th/cmp-buffer",
+  },
+
+  -- cmp-path: File path completion source
+  {
+    "hrsh7th/cmp-path",
+  },
+
+  -- cmp_luasnip: LuaSnip completion source
+  {
+    "saadparwaiz1/cmp_luasnip",
+  },
+
+  -- nvim-autopairs: Auto close brackets, quotes, etc.
+  {
+    "windwp/nvim-autopairs",
+    event = "InsertEnter",
+    config = function()
+      local autopairs = require("nvim-autopairs")
+      autopairs.setup({
+        check_ts = true, -- Enable treesitter integration
+        ts_config = {
+          lua = { "string" }, -- Don't add pairs in lua string treesitter nodes
+          javascript = { "template_string" }, -- Don't add pairs in JS template strings
+          java = false, -- Don't check treesitter on java
+        },
+      })
+
+      -- Integrate with nvim-cmp
+      local cmp_autopairs = require("nvim-autopairs.completion.cmp")
+      local cmp = require("cmp")
+      cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
+    end,
+  },
+
+  -- ===================================================
   -- Plugin Structure:
   -- ===================================================
   -- {
