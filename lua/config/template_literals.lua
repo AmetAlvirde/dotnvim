@@ -20,6 +20,18 @@ function M.setup()
     highlight link javaScriptStringT_htmlEndTag htmlEndTag
     highlight link javaScriptStringT_htmlArg htmlArg
     highlight link javaScriptStringT_htmlString htmlString
+    
+    " Define syntax rules for CSS in template literals
+    syntax match javaScriptStringT_cssProperty /\w\+\s*:/ containedin=javaScriptStringT
+    syntax match javaScriptStringT_cssBraces /[{}]/ containedin=javaScriptStringT
+    syntax match javaScriptStringT_cssSemicolon /;/ containedin=javaScriptStringT
+    syntax match javaScriptStringT_cssValue /:\s*[^;]*/ containedin=javaScriptStringT
+    
+    " Link to existing CSS groups
+    highlight link javaScriptStringT_cssProperty cssProp
+    highlight link javaScriptStringT_cssBraces cssBraces
+    highlight link javaScriptStringT_cssSemicolon cssNoise
+    highlight link javaScriptStringT_cssValue cssAttr
   ]])
   
   -- Add manual highlighting for template literals
@@ -31,6 +43,10 @@ function M.setup()
     highlight javaScriptStringT_htmlEndTag ctermfg=magenta guifg=#d33682
     highlight javaScriptStringT_htmlArg ctermfg=yellow guifg=#b58900
     highlight javaScriptStringT_htmlString ctermfg=cyan guifg=#2aa198
+    highlight javaScriptStringT_cssProperty ctermfg=yellow guifg=#b58900
+    highlight javaScriptStringT_cssBraces ctermfg=magenta guifg=#d33682
+    highlight javaScriptStringT_cssSemicolon ctermfg=green guifg=#859900
+    highlight javaScriptStringT_cssValue ctermfg=cyan guifg=#2aa198
   ]])
   
   -- Emmet configuration is handled in the plugins/init.lua file
