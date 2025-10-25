@@ -32,6 +32,9 @@ function M.setup()
     highlight javaScriptStringT_htmlArg ctermfg=yellow guifg=#b58900
     highlight javaScriptStringT_htmlString ctermfg=cyan guifg=#2aa198
   ]])
+  
+  -- Emmet configuration is handled in the plugins/init.lua file
+  -- No need to duplicate the autocmd here as it's already configured in the plugin setup
 end
 
 -- Initialize the template literals highlighting
