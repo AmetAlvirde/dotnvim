@@ -24,42 +24,37 @@ return {
   -- vim-html-template-literals: Enhanced syntax highlighting for HTML within JavaScript template literals
   {
     "jonsmithers/vim-html-template-literals",
-    lazy = false, -- Load immediately for syntax highlighting
+    lazy = false,
     config = function()
-      -- Enable the plugin
       vim.g.html_template_literals = 1
-      -- Force syntax highlighting
       vim.cmd("syntax on")
     end,
   },
 
-  -- Alternative: vim-jsx-pretty for better JSX/HTML syntax highlighting
-  {
-    "MaxMEllon/vim-jsx-pretty",
-    lazy = false,
-    config = function()
-      -- Enable JSX syntax highlighting
-      vim.g.jsx_ext_required = 0
-    end,
-  },
-
-  -- Additional: vim-javascript for better JavaScript syntax
+  -- vim-javascript: Enhanced JavaScript syntax highlighting
   {
     "pangloss/vim-javascript",
     lazy = false,
     config = function()
-      -- Enable JavaScript syntax highlighting
       vim.g.javascript_plugin_jsdoc = 1
       vim.g.javascript_plugin_ng = 1
     end,
   },
 
-  -- Better template literal support
+  -- vim-jsx-pretty: Enhanced JSX/HTML syntax highlighting
+  {
+    "MaxMEllon/vim-jsx-pretty",
+    lazy = false,
+    config = function()
+      vim.g.jsx_ext_required = 0
+    end,
+  },
+
+  -- typescript-vim: TypeScript syntax highlighting
   {
     "leafgarland/typescript-vim",
     lazy = false,
     config = function()
-      -- Enable TypeScript syntax highlighting
       vim.g.typescript_indent_disable = 1
     end,
   },
