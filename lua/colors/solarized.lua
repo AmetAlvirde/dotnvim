@@ -296,6 +296,15 @@ function M.setup()
     ["@punctuation.bracket"] = { fg = c.fg2 },
     ["@punctuation.delimiter"] = { fg = c.fg2 },
     ["@punctuation.special"] = { fg = c.magenta },
+    
+    -- Rainbow brackets highlight groups
+    RainbowDelimiterRed = { fg = c.red },
+    RainbowDelimiterYellow = { fg = c.yellow },
+    RainbowDelimiterBlue = { fg = c.blue },
+    RainbowDelimiterOrange = { fg = c.orange },
+    RainbowDelimiterGreen = { fg = c.green },
+    RainbowDelimiterViolet = { fg = c.violet },
+    RainbowDelimiterCyan = { fg = c.cyan },
     ["@macro"] = { fg = c.orange },
     ["@define"] = { fg = c.orange },
     ["@include"] = { fg = c.orange },
