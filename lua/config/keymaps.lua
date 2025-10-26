@@ -109,6 +109,14 @@ keymap("n", "<leader>fp", function()
   require("telescope.builtin").git_files()
 end, { desc = "Find files in git project root" })
 
+-- Find recent buffers with Telescope
+keymap("n", "<leader>fr", function()
+  require("telescope.builtin").buffers({
+    sort_mru = true,
+    ignore_current_buffer = true,
+  })
+end, { desc = "Find recent buffers" })
+
 -- Go to last buffer (immediately switch to most recently used buffer)
 keymap("n", "<leader>fl", function()
   -- Get all loaded buffers
