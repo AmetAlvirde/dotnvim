@@ -40,6 +40,11 @@ keymap("i", ";", ";<c-g>u")
 -- save file
 keymap({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 
+-- format file
+keymap("n", "<leader>f", function()
+  require("conform").format({ async = true, lsp_fallback = true })
+end, { desc = "Format file" })
+
 -- QuickFix
 keymap("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix" })
 keymap("n", "[q", "<cmd>cprev<cr>", { desc = "Prev quickfix" })

@@ -155,6 +155,9 @@ function M.setup()
     -- Sign column
     SignColumn = { fg = c.fg2, bg = c.bg0 },
     
+    -- Color column (80-character line)
+    ColorColumn = { bg = c.bg1 },
+    
     -- Menu
     Pmenu = { fg = c.fg0, bg = c.bg1 },
     PmenuSel = { fg = c.bg0, bg = c.fg0 },

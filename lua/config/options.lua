@@ -12,6 +12,8 @@ opt.autoindent = true
 
 -- line wrapping
 opt.wrap = false
+opt.textwidth = 80
+opt.wrapmargin = 0
 
 -- search settings
 opt.ignorecase = true
@@ -41,7 +43,7 @@ opt.splitbelow = true
 -- turn off swapfile
 opt.swapfile = false
 opt.backup = false
-opt.undodir = vim.fn.stdpath("config") .. "/undodir"
+opt.undodir = vim.fn.stdpath("cache") .. "/undodir"
 opt.undofile = true
 
 -- scrolloff
