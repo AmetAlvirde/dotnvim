@@ -58,6 +58,10 @@ opt.updatetime = 50
 -- colorcolumn
 opt.colorcolumn = "80"
 
+-- spell checking
+opt.spell = false
+opt.spelllang = "en"
+
 -- leader key
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
