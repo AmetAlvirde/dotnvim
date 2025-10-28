@@ -479,7 +479,7 @@ return {
           html = { "prettier" },
           css = { "prettier" },
           scss = { "prettier" },
-          markdown = { "prettier" },
+          markdown = { "prettier-markdown" },
           python = { "black", "isort" },
           go = { "gofmt", "goimports" },
           rust = { "rustfmt" },
@@ -494,6 +494,10 @@ return {
         formatters = {
           prettier = {
             prepend_args = { "--print-width", "80", "--tab-width", "2" },
+          },
+          ["prettier-markdown"] = {
+            command = "prettier",
+            args = { "--stdin-filepath", "$FILENAME", "--print-width", "80", "--tab-width", "2", "--prose-wrap", "always" },
           },
           black = {
             prepend_args = { "--line-length", "80" },
@@ -1073,11 +1077,7 @@ return {
       workspaces = {
         {
           name = "conscium",
-          path = "/Users/amet/Library/Mobile Documents/iCloud~md~obsidian/Documents/Mapa Total de mi consciencia/conscium",
-        },
-        {
-          name = "AmetAlvirde",
-          path = "/Users/amet/Library/Mobile Documents/iCloud~md~obsidian/Documents/Mapa Total de mi consciencia/Amet Alvirde",
+          path = "/Users/amet/2025/conscium",
         },
       },
       

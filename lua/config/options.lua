@@ -46,6 +46,7 @@ opt.splitbelow = true
 -- turn off swapfile
 opt.swapfile = false
 opt.backup = false
+opt.writebackup = false  -- Disable write backup to prevent E13 errors
 opt.undodir = vim.fn.stdpath("cache") .. "/undodir"
 opt.undofile = true
 

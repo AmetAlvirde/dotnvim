@@ -56,6 +56,41 @@ autocmd("FileType", {
   end,
 })
 
+-- Enhanced markdown configuration for better writing experience
+autocmd("FileType", {
+  pattern = "markdown",
+  callback = function()
+    local cmp = require("cmp")
+    local luasnip = require("luasnip")
+    
+    -- Disable nvim-cmp autocomplete and snippets
+    cmp.setup.buffer({
+      enabled = false,
+      sources = {}, -- Completely disable all sources
+    })
+    
+    -- Completely disable LuaSnip for markdown files
+    luasnip.config.set_config({ 
+      enable_autosnippets = false,
+      store_selection_keys = false,
+    })
+    
+    -- Clear all snippet sources for this buffer
+    vim.cmd("silent! lua require('luasnip').unlink_current()")
+    
+    -- Enable hard line wrapping at 80 characters for markdown
+    vim.opt_local.textwidth = 80
+    vim.opt_local.formatoptions = "tcroq" -- Enable text wrapping, comments, etc.
+    vim.opt_local.wrap = true
+    vim.opt_local.linebreak = true
+    vim.opt_local.breakindent = true
+    vim.opt_local.showbreak = "↪ "
+    
+    -- Enable auto-formatting on save for markdown files
+    vim.opt_local.formatprg = "prettier --print-width 80 --prose-wrap always --tab-width 2"
+  end,
+})
+
 -- Fix conceallevel for json files
 autocmd({ "FileType" }, {
   pattern = { "json", "jsonc" },
@@ -72,6 +107,26 @@ autocmd({ "BufWritePre" }, {
     end
     local file = vim.loop.fs_realpath(event.match) or event.match
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
+  end,
+})
+
+-- Auto-check for external file changes when focus returns to Neovim
+autocmd({ "FocusGained", "BufEnter" }, {
+  pattern = "*",
+  callback = function()
+    if vim.bo.buftype == "" then -- Only for normal files, not special buffers
+      vim.cmd("checktime")
+    end
+  end,
+})
+
+-- Handle Obsidian files more gracefully to prevent E13 errors
+autocmd("BufWritePre", {
+  pattern = "*.md",
+  callback = function()
+    -- Disable backup for markdown files to prevent E13 errors
+    vim.opt_local.writebackup = false
+    vim.opt_local.backup = false
   end,
 })
 

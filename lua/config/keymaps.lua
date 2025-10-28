@@ -40,10 +40,29 @@ keymap("i", ";", ";<c-g>u")
 -- save file
 keymap({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 
+-- force save file (overwrite external changes)
+keymap({ "i", "v", "n", "s" }, "<C-S>", "<cmd>w!<cr><esc>", { desc = "Force save file" })
+
+-- check if file was modified externally
+keymap("n", "<leader>ct", "<cmd>checktime<cr>", { desc = "Check if file was modified externally" })
+
+-- reload file from disk
+keymap("n", "<leader>r", "<cmd>e!<cr>", { desc = "Reload file from disk" })
+
 -- format file
 keymap("n", "<leader>f", function()
   require("conform").format({ async = true, lsp_fallback = true })
 end, { desc = "Format file" })
+
+-- format markdown with hard line breaks
+keymap("n", "<leader>fm", function()
+  if vim.bo.filetype == "markdown" then
+    -- Format with Prettier for markdown with hard line breaks
+    vim.cmd(":%!prettier --print-width 80 --prose-wrap always --tab-width 2 --stdin-filepath " .. vim.fn.expand("%"))
+  else
+    require("conform").format({ async = true, lsp_fallback = true })
+  end
+end, { desc = "Format markdown with hard line breaks" })
 
 -- QuickFix
 keymap("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix" })
@@ -150,8 +169,7 @@ end, { desc = "Go to last buffer" })
 -- Global function to enter Obsidian workspace
 local function enter_obsidian_workspace(workspace_name)
   local workspaces = {
-    conscium = "/Users/amet/Library/Mobile Documents/iCloud~md~obsidian/Documents/Mapa Total de mi consciencia/conscium",
-    AmetAlvirde = "/Users/amet/Library/Mobile Documents/iCloud~md~obsidian/Documents/Mapa Total de mi consciencia/Amet Alvirde"
+    conscium = "/Users/amet/2025/conscium",
   }
   
   local path = workspaces[workspace_name]
