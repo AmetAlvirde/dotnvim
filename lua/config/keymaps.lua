@@ -98,7 +98,7 @@ keymap("i", "<C-y>c", "<Plug>(emmet-code-pretty)", { desc = "Pretty code" })
 keymap("n", "<leader>e", "<cmd>Neotree filesystem toggle right<cr>", { desc = "Toggle Neo-tree (right side)" })
 
 -- Oil.nvim file explorer
-keymap("n", "<leader>o", "<cmd>Oil<cr>", { desc = "Open Oil file explorer" })
+-- keymap("n", "<leader>l", "<cmd>Oil<cr>", { desc = "Open Oil file explorer" })
 
 -- ===================================================
 -- Telescope Keymaps
@@ -142,3 +142,49 @@ keymap("n", "<leader>fl", function()
     end
   end
 end, { desc = "Go to last buffer" })
+
+-- ===================================================
+-- Obsidian Workspace Keymaps
+-- ===================================================
+
+-- Global function to enter Obsidian workspace
+local function enter_obsidian_workspace(workspace_name)
+  local workspaces = {
+    conscium = "/Users/amet/Library/Mobile Documents/iCloud~md~obsidian/Documents/Mapa Total de mi consciencia/conscium",
+    AmetAlvirde = "/Users/amet/Library/Mobile Documents/iCloud~md~obsidian/Documents/Mapa Total de mi consciencia/Amet Alvirde"
+  }
+  
+  local path = workspaces[workspace_name]
+  if not path then
+    vim.notify("Unknown workspace: " .. (workspace_name or "nil"), vim.log.levels.ERROR)
+    return
+  end
+  
+  -- Change to the workspace directory
+  vim.cmd('cd ' .. path)
+  -- Open the workspace in Neo-tree (file explorer)
+  -- vim.cmd('Neotree filesystem show right')
+  vim.notify('Entered Obsidian workspace: ' .. workspace_name)
+end
+
+-- Global keybindings to enter Obsidian workspaces
+keymap('n', '<leader>oc', function() enter_obsidian_workspace('conscium') end, { desc = 'Enter conscium workspace' })
+keymap('n', '<leader>oa', function() enter_obsidian_workspace('AmetAlvirde') end, { desc = 'Enter AmetAlvirde workspace' })
+keymap('n', '<leader>ow', function() enter_obsidian_workspace('conscium') end, { desc = 'Enter Obsidian workspace (default)' })
+
+-- ===================================================
+-- Obsidian Commands (Global Keymaps)
+-- ===================================================
+
+-- Obsidian note management commands
+keymap('n', '<leader>on', '<cmd>ObsidianNew<cr>', { desc = 'New note' })
+keymap('n', '<leader>oo', '<cmd>ObsidianOpen<cr>', { desc = 'Open note' })
+keymap('n', '<leader>os', '<cmd>ObsidianSearch<cr>', { desc = 'Search notes' })
+keymap('n', '<leader>oq', '<cmd>ObsidianQuickSwitch<cr>', { desc = 'Quick switch' })
+keymap('n', '<leader>of', '<cmd>ObsidianFollowLink<cr>', { desc = 'Follow link' })
+keymap('n', '<leader>ob', '<cmd>ObsidianBacklinks<cr>', { desc = 'Show backlinks' })
+keymap('n', '<leader>ot', '<cmd>ObsidianTags<cr>', { desc = 'View tags' })
+keymap('n', '<leader>op', '<cmd>ObsidianPasteImg<cr>', { desc = 'Paste image' })
+keymap('n', '<leader>or', '<cmd>ObsidianRename<cr>', { desc = 'Rename note' })
+keymap('n', '<leader>om', '<cmd>ObsidianMove<cr>', { desc = 'Move note' })
+keymap('n', '<leader>od', '<cmd>bd | call delete(expand(\'%\'))<cr>', { desc = 'Delete note' })
