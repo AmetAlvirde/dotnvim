@@ -309,6 +309,142 @@ function M.setup()
     ["@define"] = { fg = c.orange },
     ["@include"] = { fg = c.orange },
     ["@preproc"] = { fg = c.orange },
+    
+    -- Markdown syntax highlighting
+    markdownH1 = { fg = c.blue, bold = true },
+    markdownH2 = { fg = c.blue, bold = true },
+    markdownH3 = { fg = c.blue, bold = true },
+    markdownH4 = { fg = c.blue, bold = true },
+    markdownH5 = { fg = c.blue, bold = true },
+    markdownH6 = { fg = c.blue, bold = true },
+    markdownHeadingDelimiter = { fg = c.fg2 },
+    markdownHeadingRule = { fg = c.fg2 },
+    
+    markdownBold = { bold = true },
+    markdownItalic = { italic = true },
+    markdownBoldItalic = { bold = true, italic = true },
+    markdownBoldDelimiter = { fg = c.fg2 },
+    markdownItalicDelimiter = { fg = c.fg2 },
+    
+    markdownCode = { fg = c.cyan, bg = c.bg1 },
+    markdownCodeBlock = { fg = c.cyan, bg = c.bg1 },
+    markdownCodeDelimiter = { fg = c.fg2 },
+    markdownInlineCode = { fg = c.cyan, bg = c.bg1 },
+    
+    markdownLink = { fg = c.blue, underline = true },
+    markdownLinkText = { fg = c.blue, underline = true },
+    markdownLinkDelimiter = { fg = c.fg2 },
+    markdownUrl = { fg = c.cyan, underline = true },
+    markdownUrlTitle = { fg = c.cyan },
+    markdownUrlTitleDelimiter = { fg = c.fg2 },
+    
+    markdownListMarker = { fg = c.green },
+    markdownOrderedListMarker = { fg = c.green },
+    markdownUnorderedListMarker = { fg = c.green },
+    markdownListMarkerUnchecked = { fg = c.fg2 },
+    markdownListMarkerChecked = { fg = c.green },
+    
+    markdownBlockquote = { fg = c.fg2, italic = true },
+    markdownBlockquoteDelimiter = { fg = c.fg2 },
+    
+    markdownHr = { fg = c.fg2 },
+    markdownRule = { fg = c.fg2 },
+    
+    markdownTable = { fg = c.fg0 },
+    markdownTableHead = { fg = c.blue, bold = true },
+    markdownTableDelimiter = { fg = c.fg2 },
+    markdownTableRow = { fg = c.fg0 },
+    markdownTableCell = { fg = c.fg0 },
+    
+    markdownStrikethrough = { strikethrough = true },
+    markdownStrikethroughDelimiter = { fg = c.fg2 },
+    
+    markdownFootnote = { fg = c.magenta },
+    markdownFootnoteDefinition = { fg = c.magenta },
+    markdownFootnoteDelimiter = { fg = c.fg2 },
+    
+    markdownAutomaticLink = { fg = c.blue, underline = true },
+    markdownAutomaticLinkDelimiter = { fg = c.fg2 },
+    
+    markdownEscape = { fg = c.magenta },
+    markdownEscapeDelimiter = { fg = c.magenta },
+    
+    -- Treesitter markdown groups
+    ["@markdown.heading"] = { fg = c.blue, bold = true },
+    ["@markdown.heading.1"] = { fg = c.blue, bold = true },
+    ["@markdown.heading.2"] = { fg = c.blue, bold = true },
+    ["@markdown.heading.3"] = { fg = c.blue, bold = true },
+    ["@markdown.heading.4"] = { fg = c.blue, bold = true },
+    ["@markdown.heading.5"] = { fg = c.blue, bold = true },
+    ["@markdown.heading.6"] = { fg = c.blue, bold = true },
+    ["@markdown.heading.marker"] = { fg = c.fg2 },
+    
+    ["@markdown.strong"] = { bold = true },
+    ["@markdown.emphasis"] = { italic = true },
+    ["@markdown.strong_emphasis"] = { bold = true, italic = true },
+    
+    ["@markdown.code"] = { fg = c.cyan, bg = c.bg1 },
+    ["@markdown.code_block"] = { fg = c.cyan, bg = c.bg1 },
+    ["@markdown.inline_code"] = { fg = c.cyan, bg = c.bg1 },
+    ["@markdown.code_fence_content"] = { fg = c.cyan, bg = c.bg1 },
+    ["@markdown.code_fence"] = { fg = c.fg2 },
+    
+    ["@markdown.link"] = { fg = c.blue, underline = true },
+    ["@markdown.link_text"] = { fg = c.blue, underline = true },
+    ["@markdown.link_url"] = { fg = c.cyan, underline = true },
+    ["@markdown.link_label"] = { fg = c.magenta },
+    ["@markdown.link_destination"] = { fg = c.cyan },
+    
+    ["@markdown.list"] = { fg = c.green },
+    ["@markdown.list_marker"] = { fg = c.green },
+    ["@markdown.list_item"] = { fg = c.fg0 },
+    ["@markdown.ordered_list"] = { fg = c.green },
+    ["@markdown.unordered_list"] = { fg = c.green },
+    
+    ["@markdown.quote"] = { fg = c.fg2, italic = true },
+    ["@markdown.block_quote"] = { fg = c.fg2, italic = true },
+    ["@markdown.block_quote_marker"] = { fg = c.fg2 },
+    
+    ["@markdown.thematic_break"] = { fg = c.fg2 },
+    ["@markdown.horizontal_rule"] = { fg = c.fg2 },
+    
+    ["@markdown.table"] = { fg = c.fg0 },
+    ["@markdown.table_head"] = { fg = c.blue, bold = true },
+    ["@markdown.table_row"] = { fg = c.fg0 },
+    ["@markdown.table_cell"] = { fg = c.fg0 },
+    ["@markdown.table_delimiter"] = { fg = c.fg2 },
+    
+    ["@markdown.strikethrough"] = { strikethrough = true },
+    
+    ["@markdown.footnote"] = { fg = c.magenta },
+    ["@markdown.footnote_definition"] = { fg = c.magenta },
+    ["@markdown.footnote_reference"] = { fg = c.magenta },
+    
+    ["@markdown.frontmatter"] = { fg = c.fg2 },
+    ["@markdown.frontmatter_delimiter"] = { fg = c.fg2 },
+    
+    ["@markdown.escape"] = { fg = c.magenta },
+    ["@markdown.escape_sequence"] = { fg = c.magenta },
+    
+    -- Obsidian-specific markdown extensions
+    ["@markdown.wiki_link"] = { fg = c.violet, underline = true },
+    ["@markdown.wiki_link_text"] = { fg = c.violet, underline = true },
+    ["@markdown.tag"] = { fg = c.orange },
+    ["@markdown.hashtag"] = { fg = c.orange },
+    ["@markdown.mention"] = { fg = c.cyan },
+    ["@markdown.highlight"] = { fg = c.yellow, bg = c.bg2 },
+    ["@markdown.callout"] = { fg = c.blue, bg = c.bg1 },
+    ["@markdown.callout_title"] = { fg = c.blue, bold = true },
+    
+    -- Additional markdown elements
+    markdownWikiLink = { fg = c.violet, underline = true },
+    markdownWikiLinkText = { fg = c.violet, underline = true },
+    markdownTag = { fg = c.orange },
+    markdownHashtag = { fg = c.orange },
+    markdownMention = { fg = c.cyan },
+    markdownHighlight = { fg = c.yellow, bg = c.bg2 },
+    markdownCallout = { fg = c.blue, bg = c.bg1 },
+    markdownCalloutTitle = { fg = c.blue, bold = true },
   }
   
   -- Apply highlights
@@ -325,18 +461,63 @@ function M.setup()
   vim.api.nvim_set_hl(0, "javaScriptStringT.htmlSpecialChar", { fg = c.magenta })
   vim.api.nvim_set_hl(0, "javaScriptStringT.htmlEndTag", { fg = c.magenta, bold = true })
   
+  -- Additional markdown-specific highlighting
+  vim.api.nvim_set_hl(0, "markdownMath", { fg = c.magenta, bg = c.bg1 })
+  vim.api.nvim_set_hl(0, "markdownMathDelimiter", { fg = c.fg2 })
+  vim.api.nvim_set_hl(0, "markdownMathBlock", { fg = c.magenta, bg = c.bg1 })
+  vim.api.nvim_set_hl(0, "markdownMathBlockDelimiter", { fg = c.fg2 })
+  
+  -- Task list highlighting
+  vim.api.nvim_set_hl(0, "markdownTaskChecked", { fg = c.green, bold = true })
+  vim.api.nvim_set_hl(0, "markdownTaskUnchecked", { fg = c.fg2 })
+  
+  -- Definition lists
+  vim.api.nvim_set_hl(0, "markdownDefinitionTerm", { fg = c.blue, bold = true })
+  vim.api.nvim_set_hl(0, "markdownDefinition", { fg = c.fg0 })
+  
+  -- Additional Obsidian features
+  vim.api.nvim_set_hl(0, "markdownEmbeddedCode", { fg = c.cyan, bg = c.bg1 })
+  vim.api.nvim_set_hl(0, "markdownEmbeddedCodeDelimiter", { fg = c.fg2 })
+  
+  -- Ensure proper contrast for readability
+  vim.api.nvim_set_hl(0, "markdownCodeBlock", { fg = c.cyan, bg = c.bg1 })
+  vim.api.nvim_set_hl(0, "markdownInlineCode", { fg = c.cyan, bg = c.bg1 })
+  
   -- Set colorscheme name
   vim.g.colors_name = "solarized"
+  
+  -- Refresh lualine if it exists (for automatic OS theme changes)
+  vim.defer_fn(function()
+    if vim.fn.exists(':LualineRefresh') == 2 then
+      vim.cmd("LualineRefresh")
+    end
+  end, 200)
 end
 
 -- Function to toggle theme
 function M.toggle()
+  local old_bg = vim.o.background
   if vim.o.background == "dark" then
     vim.o.background = "light"
   else
     vim.o.background = "dark"
   end
+  print("Solarized: Toggling from", old_bg, "to", vim.o.background)
+  
   M.setup()
+  
+  -- Trigger a redraw to ensure all plugins update
+  vim.cmd("redraw!")
+  
+  -- Explicitly refresh lualine if it exists
+  vim.defer_fn(function()
+    if vim.fn.exists(':LualineRefresh') == 2 then
+      print("Solarized: Manually refreshing lualine...")
+      vim.cmd("LualineRefresh")
+    else
+      print("Solarized: LualineRefresh command not found")
+    end
+  end, 150)
 end
 
 -- Function to set specific theme
@@ -344,6 +525,16 @@ function M.set_theme(theme)
   if theme == "dark" or theme == "light" then
     vim.o.background = theme
     M.setup()
+    
+    -- Trigger a redraw to ensure all plugins update
+    vim.cmd("redraw!")
+    
+    -- Explicitly refresh lualine if it exists
+    vim.defer_fn(function()
+      if vim.fn.exists(':LualineRefresh') == 2 then
+        vim.cmd("LualineRefresh")
+      end
+    end, 150)
   end
 end
 

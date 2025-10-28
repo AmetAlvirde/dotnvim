@@ -49,6 +49,20 @@ keymap("n", "<leader>ct", "<cmd>checktime<cr>", { desc = "Check if file was modi
 -- reload file from disk
 keymap("n", "<leader>r", "<cmd>e!<cr>", { desc = "Reload file from disk" })
 
+-- Solarized theme toggle
+keymap("n", "<leader>tt", function()
+  require("colors.solarized").toggle()
+end, { desc = "Toggle Solarized theme (dark/light)" })
+
+-- Manual lualine refresh (for debugging)
+keymap("n", "<leader>tr", function()
+  if vim.fn.exists(':LualineRefresh') == 2 then
+    vim.cmd("LualineRefresh")
+  else
+    print("LualineRefresh command not available")
+  end
+end, { desc = "Refresh lualine theme manually" })
+
 -- format file
 keymap("n", "<leader>f", function()
   require("conform").format({ async = true, lsp_fallback = true })
