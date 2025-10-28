@@ -729,11 +729,16 @@ return {
           [""] = "rainbow-delimiters",
           lua = "rainbow-blocks",
           javascript = "rainbow-delimiters-react",
-          typescript = "rainbow-delimiters-react",
-          tsx = "rainbow-delimiters-react",
+          -- tsx and ts files should use rainbow-delimiters-react, but it's not working. So
+          -- we use rainbow-delimiters instead.
+          typescript = "rainbow-delimiters",
+          tsx = "rainbow-delimiters",
           jsx = "rainbow-delimiters-react",
-          html = "rainbow-tags",
+          -- rainbow-tags seems like a good idea, but I want to work on the solarized theme first.
+          -- html = "rainbow-tags",
         },
+        -- This will prevent rainbow colors on JSX angle brackets
+        blacklist = { 'jsx_element', 'jsx_self_closing_element', 'jsx_fragment', 'template_string' }, 
         highlight = {
           "RainbowDelimiterYellow", 
           "RainbowDelimiterOrange",
@@ -747,6 +752,22 @@ return {
   -- ===================================================
   -- Git Integration Plugins
   -- ===================================================
+
+  -- lazygit.nvim: Terminal UI for git commands
+  {
+    "kdheepak/lazygit.nvim",
+    lazy = false,
+    -- optional for floating window border decoration
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+    },
+    config = function()
+      vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "Open LazyGit" })
+      vim.keymap.set("n", "<leader>gf", ":LazyGitFilter<CR>", { desc = "Open LazyGit (filtered)" })
+      vim.keymap.set("n", "<leader>gc", ":LazyGitConfig<CR>", { desc = "Open LazyGit config" })
+      vim.keymap.set("n", "<leader>gF", ":LazyGitFilterCurrentFile<CR>", { desc = "Open LazyGit (current file)" })
+    end,
+  },
 
   -- gitsigns.nvim: Git signs/lines and integration (lightweight)
   {

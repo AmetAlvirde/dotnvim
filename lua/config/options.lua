@@ -11,9 +11,12 @@ opt.expandtab = true
 opt.autoindent = true
 
 -- line wrapping
-opt.wrap = false
-opt.textwidth = 80
-opt.wrapmargin = 0
+opt.wrap = true          -- Enable visual wrapping as fallback
+opt.textwidth = 80       -- Set textwidth for hard wrapping
+opt.wrapmargin = 0       -- Keep this as 0
+opt.linebreak = true     -- Break at word boundaries
+opt.breakindent = true   -- Maintain indentation on wrapped lines
+opt.showbreak = "↪ "     -- Visual indicator for wrapped lines
 
 -- search settings
 opt.ignorecase = true
