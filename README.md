@@ -3,7 +3,7 @@
 A modern Neovim configuration built from scratch, designed for web development
 and note-taking workflows with a focus on developer experience and productivity.
 
-## 🎯 Overview
+## Overview
 
 This is a comprehensive Neovim configuration that provides a complete
 development environment with:
@@ -17,16 +17,16 @@ development environment with:
 - **Git Integration**: Comprehensive git workflow with multiple tools
 - **Developer Experience**: Carefully tuned settings, autopairs, rainbow delimiters, etc.
 
-## ✨ Key Features
+## Key Features
 
-### 🎨 Custom Solarized Theme
+### Custom Solarized Theme
 
 - **Automatic Theme Switching**: Detects macOS system preferences and switches between light/dark modes
 - **Custom Implementation**: Built from scratch with proper Solarized color palette
 - **Dynamic Statusline**: Lualine automatically adapts to theme changes
 - **Manual Controls**: Quick toggle with `<leader>tt` or specific theme commands
 
-### 🌐 Web Development Excellence
+### Web Development Excellence
 
 - **Enhanced Syntax Highlighting**:
   - HTML and CSS syntax highlighting inside JavaScript template literals
@@ -36,21 +36,21 @@ development environment with:
 - **TypeScript/JavaScript LSP**: Complete language server with inlay hints
 - **Code Formatting**: Prettier integration with format-on-save
 
-### 📝 Obsidian Integration
+### Obsidian Integration
 
 - **Workspace Management**: Seamless integration with Obsidian vaults
 - **Custom Note Templates**: Automatic frontmatter generation with timestamps
 - **Link Navigation**: Follow and create Obsidian links
 - **Search Integration**: Full-text search within your vault
 
-### 🔍 Navigation & Search
+### Navigation & Search
 
 - **Telescope**: Fuzzy finding with FZF native performance
 - **Neo-tree**: Modern file explorer sidebar
 - **Buffer Management**: Quick switching between recent files
 - **Git Navigation**: Seamless git history and diff viewing
 
-### ⚡ Developer Experience
+### Developer Experience
 
 - **Tmux Integration**: Navigate between tmux panes and vim windows with `<C-hjkl>`
 - **Auto-pairs**: Smart bracket and quote completion
@@ -58,7 +58,7 @@ development environment with:
 - **Persistent Undo**: Never lose your changes
 - **Auto-formatting**: Format code on save for multiple languages
 
-## 🛠 Core Plugins
+## Core Plugins
 
 ### Language Support
 
@@ -86,7 +86,7 @@ development environment with:
 - **Auto-pairs**: Smart bracket/quote completion
 - **Tmux Navigator**: Seamless tmux integration
 
-## 🚀 Installation
+## Installation
 
 ### Prerequisites
 
@@ -128,7 +128,7 @@ development environment with:
 
 2. Use `<leader>oc` to enter your Obsidian workspace
 
-## 📁 Configuration Structure
+## Configuration Structure
 
 ```
 ~/.config/nvim/
@@ -148,7 +148,7 @@ development environment with:
     └── solarized.lua        # Theme fallback
 ```
 
-## 📝 Requirements
+## Requirements
 
 - **Neovim**: 0.11.0+
 - **Git**: For plugin management
@@ -156,7 +156,7 @@ development environment with:
 - **Tmux**: For tmux integration (optional)
 - **macOS/Linux**: For automatic theme detection
 
-## 🤝 Contributing
+## Contributing
 
 This is a personal configuration, but suggestions and improvements are welcome!
 Feel free to:
@@ -165,6 +165,6 @@ Feel free to:
 - Suggest new features
 - Share your own customizations
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
