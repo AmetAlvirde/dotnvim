@@ -186,12 +186,22 @@ end, { desc = "Go to last buffer" })
 local function enter_obsidian_workspace(workspace_name)
   local workspaces = {
     conscium = "/Users/amet/2025/conscium",
+    cronicasDeUnCorredorComoTu = "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
   }
   
   local path = workspaces[workspace_name]
   if not path then
     vim.notify("Unknown workspace: " .. (workspace_name or "nil"), vim.log.levels.ERROR)
     return
+  end
+  
+  -- Switch Obsidian.nvim workspace
+  local ok, obsidian = pcall(require, "obsidian")
+  if ok then
+    local client = obsidian.get_client()
+    if client then
+      client:switch_workspace(workspace_name)
+    end
   end
   
   -- Change to the workspace directory
@@ -203,8 +213,8 @@ end
 
 -- Global keybindings to enter Obsidian workspaces
 keymap('n', '<leader>oc', function() enter_obsidian_workspace('conscium') end, { desc = 'Enter conscium workspace' })
-keymap('n', '<leader>oa', function() enter_obsidian_workspace('AmetAlvirde') end, { desc = 'Enter AmetAlvirde workspace' })
-keymap('n', '<leader>ow', function() enter_obsidian_workspace('conscium') end, { desc = 'Enter Obsidian workspace (default)' })
+-- keymap('n', '<leader>oa', function() enter_obsidian_workspace('AmetAlvirde') end, { desc = 'Enter AmetAlvirde workspace' })
+keymap('n', '<leader>or', function() enter_obsidian_workspace('cronicasDeUnCorredorComoTu') end, { desc = 'Enter cronicasDeUnCorredorComoTu workspace' })
 
 local function link_or_create_obsidian_note()
   local ok, obsidian = pcall(require, "obsidian")
@@ -247,16 +257,94 @@ local function link_or_create_obsidian_note()
     client:update_ui()
   end
 
+  local function create_and_link_note(input_title)
+    local title
+    if type(input_title) == "string" then
+      title = vim.trim(input_title)
+      if title == "" then
+        title = nil
+      end
+    end
+    if not title then
+      title = selection
+    end
+    local ok, note = pcall(client.create_note, client, { title = title })
+    if not ok then
+      vim.notify(string.format("Failed to create note for “%s”: %s", title, note), vim.log.levels.ERROR)
+      return
+    end
+    if not note or not note.path then
+      vim.notify(string.format("Note creation returned invalid result for “%s”", title), vim.log.levels.ERROR)
+      return
+    end
+    if not note.path:is_file() then
+      local write_ok, write_err = pcall(function()
+        note = client:write_note(note)
+      end)
+      if not write_ok then
+        vim.notify(string.format("Failed to write note for “%s”: %s", title, write_err), vim.log.levels.ERROR)
+        return
+      end
+    end
+    vim.notify(string.format("Linked to new note: %s", tostring(note.path)), vim.log.levels.INFO)
+    insert_link(note)
+  end
+
   client:resolve_note_async(selection, function(...)
     local notes = { ... }
     vim.schedule(function()
       if #notes == 0 then
         local picker = client:picker()
         if picker then
+          local query_mappings = picker:_note_query_mappings() or {}
+          query_mappings["<C-y>"] = {
+            desc = "new note",
+            callback = function(query)
+              create_and_link_note(query)
+            end,
+          }
+
+          local selection_mappings = picker:_note_selection_mappings() or {}
+          selection_mappings["<C-y>"] = {
+            desc = "new note",
+            callback = function(...)
+              create_and_link_note(...)
+            end,
+            fallback_to_query = true,
+          }
+
+          local query_mappings = picker._note_query_mappings and picker:_note_query_mappings() or {}
+          query_mappings["<C-y>"] = {
+            desc = "new note",
+            callback = function(query)
+              create_and_link_note(query)
+            end,
+          }
+
+          local selection_mappings = picker._note_selection_mappings and picker:_note_selection_mappings() or {}
+          selection_mappings["<C-y>"] = {
+            desc = "new note",
+            callback = function(...)
+              create_and_link_note(...)
+            end,
+            fallback_to_query = true,
+          }
+
           picker:find_notes({
             prompt_title = string.format("Link “%s” to…", selection),
+            no_default_mappings = true,
+            query_mappings = query_mappings,
+            selection_mappings = selection_mappings,
             callback = function(path)
               if not path or path == "" then
+                local choice = vim.fn.confirm(
+                  string.format("Create new note for “%s”?", selection),
+                  "&Create\n&Cancel",
+                  1
+                )
+                if choice == 1 then
+                  create_and_link_note(selection)
+                end
                 return
               end
               local ok_note, note = pcall(function()
@@ -319,7 +407,7 @@ keymap('n', '<leader>of', '<cmd>ObsidianFollowLink<cr>', { desc = 'Follow link' 
 keymap('n', '<leader>ob', '<cmd>ObsidianBacklinks<cr>', { desc = 'Show backlinks' })
 keymap('n', '<leader>ot', '<cmd>ObsidianTags<cr>', { desc = 'View tags' })
 keymap('n', '<leader>op', '<cmd>ObsidianPasteImg<cr>', { desc = 'Paste image' })
-keymap('n', '<leader>or', '<cmd>ObsidianRename<cr>', { desc = 'Rename note' })
-keymap('n', '<leader>om', '<cmd>ObsidianMove<cr>', { desc = 'Move note' })
+keymap('n', '<leader>om', '<cmd>ObsidianRename<cr>', { desc = 'Rename note' })
+-- keymap('n', '<leader>om', '<cmd>ObsidianMove<cr>', { desc = 'Move note' })
 keymap("v", "<leader>ol", link_or_create_obsidian_note, { desc = "Link or create Obsidian note" })
 keymap('n', '<leader>od', '<cmd>bd | call delete(expand(\'%\'))<cr>', { desc = 'Delete note' })

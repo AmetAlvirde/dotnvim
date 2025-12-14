@@ -1308,6 +1308,10 @@ return {
           name = "conscium",
           path = "/Users/amet/2025/conscium",
         },
+        {
+          name = "cronicasDeUnCorredorComoTu",
+          path = "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
+        },
       },
       
       -- Remove notes_subdir to keep notes in root
