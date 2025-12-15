@@ -50,3 +50,4 @@ table.insert(plugins, require("plugins.lualine"))
 table.insert(plugins, require("plugins.obsidian"))
 
 return plugins
+

@@ -3,10 +3,9 @@
 A modern Neovim configuration built from scratch, designed for web development
 and note-taking workflows with a focus on developer experience and productivity.
 
-## Overview
+## TLDR
 
-This is a comprehensive Neovim configuration that provides a complete
-development environment with:
+With this configuration, you get an nvim environment with:
 
 - **Modern Package Management**: Lazy.nvim for efficient plugin loading
 - **Seamless Tmux Integration**: Navigate between tmux panes and vim windows effortlessly
@@ -57,6 +56,7 @@ development environment with:
 - **Rainbow Delimiters**: Color-coded brackets and parentheses
 - **Persistent Undo**: Never lose your changes
 - **Auto-formatting**: Format code on save for multiple languages
+- **Lualine**: Custom Solarized-themed statusline
 
 ## Core Plugins
 
@@ -79,12 +79,6 @@ development environment with:
 - **Treesitter**: Advanced syntax highlighting for 30+ languages
 - **Rainbow Delimiters**: Color-coded brackets and parentheses
 - **Template Literals**: Custom highlighting for HTML/CSS in JS template strings
-
-### UI & Experience
-
-- **Lualine**: Custom Solarized-themed statusline
-- **Auto-pairs**: Smart bracket/quote completion
-- **Tmux Navigator**: Seamless tmux integration
 
 ## Installation
 
@@ -115,7 +109,7 @@ development environment with:
 
 ### Obsidian Setup
 
-1. Update the workspace path in `lua/plugins/init.lua`:
+1. Update the workspace path in `lua/plugins/obsidian.lua`:
 
    ```lua
    workspaces = {
@@ -139,9 +133,11 @@ development environment with:
 │   │   ├── options.lua      # Neovim options
 │   │   ├── keymaps.lua      # Key mappings
 │   │   ├── autocmds.lua     # Auto-commands
-│   │   └── template_literals.lua # Custom syntax
-│   ├── plugins/
-│   │   └── init.lua         # Plugin configurations
+│   │   └── plugins.lua      # Plugin loader (aggregates all plugins)
+│   ├── utils/               # Helper utilities
+│   │   └── template_literals.lua # Custom syntax highlighting
+│   ├── plugins/             # Individual plugin configurations
+│   │   └── *.lua            # One file per plugin and its configs
 │   └── colors/
 │       └── solarized.lua    # Custom Solarized theme
 └── colors/
