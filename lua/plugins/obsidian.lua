@@ -8,11 +8,27 @@ return {
     "nvim-lua/plenary.nvim",
   },
   config = function()
+    --- Timezone suffix for frontmatter, e.g. "(GMT-6)" or "(GMT+5:30)".
+    --- Uses strftime %z (RFC 822 style) so offset matches the system clock.
+    local function get_tz_offset()
+      local z = vim.fn.strftime("%z")
+      if not z or #z < 5 then
+        return "(GMT)"
+      end
+      local sign = z:sub(1, 1) == "-" and "-" or "+"
+      local hh = tonumber(z:sub(2, 3), 10) or 0
+      local mm = tonumber(z:sub(4, 5), 10) or 0
+      if mm > 0 then
+        return string.format("(GMT%s%d:%02d)", sign, hh, mm)
+      end
+      return string.format("(GMT%s%d)", sign, hh)
+    end
+
     require("obsidian").setup({
       workspaces = {
         {
           name = "conscium",
-          path = "/Users/amet/2025/conscium",
+          path = "/Users/amet/Writing/conscium",
         },
         {
           name = "cronicasDeUnCorredorComoTu",
@@ -28,40 +44,49 @@ return {
         date_format = "%Y-%m-%d",
       },
       
-      -- Custom ID generation function
+      -- Custom ID generation function (filename stem; UTF-8 safe, no unix prefix)
       note_id_func = function(title)
         local suffix = ""
         if title ~= nil then
-          -- Transform title into a valid file name.
-          suffix = title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
-        else
-          -- If title is nil, add 4 random uppercase letters to the suffix.
+          -- Keep Unicode letters; strip only filesystem-unsafe chars; lowercase via Vim (UTF-8 aware).
+          -- Parentheses: gsub returns (str, count); only the string must be passed to tolower.
+          suffix = vim.fn.tolower((title:gsub("%s+", "-"):gsub('[/\\:*?"<>|]', "")))
+        end
+        if suffix == "" then
           for _ = 1, 4 do
             suffix = suffix .. string.char(math.random(65, 90))
           end
         end
-        return tostring(os.time()) .. "-" .. suffix
+        return suffix
       end,
       
       -- Custom frontmatter template function
       note_frontmatter_func = function(note)
-        -- Add the title of the note as an alias.
         if note.title then
           note:add_alias(note.title)
         end
 
-        local out = { 
-          id = note.id, 
-          aliases = note.aliases, 
+        local tz = get_tz_offset()
+        local now = os.date("%Y-%m-%d %H:%M:%S") .. " " .. tz
+
+        local created = now
+        if note.metadata and note.metadata.created then
+          created = note.metadata.created
+        end
+
+        local out = {
+          id = note.id,
+          aliases = note.aliases,
           tags = note.tags,
-          created = os.date("%Y-%m-%d %H:%M:%S"),
-          modified = os.date("%Y-%m-%d %H:%M:%S")
+          created = created,
+          modified = now,
         }
 
-        -- Preserve any manually added fields in the frontmatter.
         if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
           for k, v in pairs(note.metadata) do
-            out[k] = v
+            if k ~= "created" and k ~= "modified" then
+              out[k] = v
+            end
           end
         end
 

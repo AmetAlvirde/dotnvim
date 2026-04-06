@@ -185,7 +185,7 @@ end, { desc = "Go to last buffer" })
 -- Global function to enter Obsidian workspace
 local function enter_obsidian_workspace(workspace_name)
   local workspaces = {
-    conscium = "/Users/amet/2025/conscium",
+    conscium = "/Users/amet/Writing/conscium",
     cronicasDeUnCorredorComoTu = "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
   }
   
