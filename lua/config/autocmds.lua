@@ -203,3 +203,58 @@ vim.api.nvim_create_user_command("ObsCLITaskToggle", function()
     vim.notify(msg, vim.log.levels.INFO)
   end
 end, { desc = "Toggle selected Obsidian task (from quickfix)" })
+
+-- ===================================================
+-- Obsidian CLI (commands-only; batch 1 feature #3)
+-- ===================================================
+
+vim.api.nvim_create_user_command("ObsCLIOrphans", function()
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local success, msg = obscli.orphans_to_quickfix()
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "List Obsidian orphan notes into quickfix" })
+
+vim.api.nvim_create_user_command("ObsCLIDeadends", function()
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local success, msg = obscli.deadends_to_quickfix()
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "List Obsidian dead-end notes into quickfix" })
+
+vim.api.nvim_create_user_command("ObsCLIUnresolved", function()
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local success, msg = obscli.unresolved_to_quickfix()
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "List Obsidian unresolved links (verbose) into quickfix" })

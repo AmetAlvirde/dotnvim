@@ -108,6 +108,103 @@ local function open_scratch(title, lines)
   vim.api.nvim_win_set_buf(0, buf)
 end
 
+local function paths_to_quickfix(title, lines)
+  local items = {}
+  for _, line in ipairs(lines or {}) do
+    local p = vim.trim(line or "")
+    if p ~= "" and not p:match("^%s*total%s*$") then
+      table.insert(items, {
+        filename = p,
+        lnum = 1,
+        col = 1,
+        text = p,
+      })
+    end
+  end
+
+  vim.fn.setqflist({}, " ", {
+    title = title,
+    items = items,
+  })
+
+  if #items == 0 then
+    return true, "No results."
+  end
+  vim.cmd("copen")
+  return true, string.format("Loaded %d item(s) into quickfix.", #items)
+end
+
+function M.orphans_to_quickfix()
+  local lines, err = run_obsidian_cli("obsidian orphans")
+  if not lines then
+    return false, err
+  end
+  return paths_to_quickfix("Obsidian Orphans", lines)
+end
+
+function M.deadends_to_quickfix()
+  local lines, err = run_obsidian_cli("obsidian deadends")
+  if not lines then
+    return false, err
+  end
+  return paths_to_quickfix("Obsidian Deadends", lines)
+end
+
+function M.unresolved_to_quickfix()
+  -- `unresolved verbose` prints: `<link>\t<count>\t<source1.md, source2.md>`
+  local lines, err = run_obsidian_cli("obsidian unresolved verbose")
+  if not lines then
+    return false, err
+  end
+
+  local items = {}
+  for _, line in ipairs(lines or {}) do
+    if line and line ~= "" then
+      local parts = vim.split(line, "\t", { plain = true })
+      if #parts >= 3 then
+        local link = vim.trim(parts[1] or "")
+        local count = tonumber(vim.trim(parts[2] or ""), 10)
+        local sources = vim.trim(parts[3] or "")
+
+        -- Make it actionable: jump to the first source file if present.
+        local first_source = sources:match("^%s*([^,%s]+%.md)%s*[, ]") or sources:match("^%s*([^,%s]+%.md)%s*$")
+
+        if first_source and first_source ~= "" then
+          table.insert(items, {
+            filename = first_source,
+            lnum = 1,
+            col = 1,
+            text = string.format("%s (count=%s) sources: %s", link, tostring(count or ""), sources),
+          })
+        else
+          table.insert(items, {
+            filename = "",
+            lnum = 1,
+            col = 1,
+            text = string.format("%s (count=%s) sources: %s", link, tostring(count or ""), sources),
+          })
+        end
+      end
+    end
+  end
+
+  vim.fn.setqflist({}, " ", {
+    title = "Obsidian Unresolved Links (verbose)",
+    items = items,
+  })
+
+  if #items == 0 then
+    if lines and #lines > 0 then
+      open_scratch("ObsidianUnresolvedRawOutput", lines)
+      return true, "No unresolved links parsed. Opened raw output buffer."
+    end
+    return true, "No unresolved links."
+  end
+
+  vim.cmd("copen")
+  return true, string.format("Loaded %d unresolved link(s) into quickfix.", #items)
+end
+
 function M.tasks_to_quickfix(opts)
   opts = opts or {}
   local only_todo = opts.only_todo ~= false
