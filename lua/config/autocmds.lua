@@ -405,3 +405,51 @@ end, {
   desc = "List Obsidian backlinks with counts (JSON) into quickfix",
   nargs = "?",
 })
+
+-- ===================================================
+-- Obsidian CLI (commands-only; batch 2 feature #13)
+-- ===================================================
+
+vim.api.nvim_create_user_command("ObsCLIWordCount", function(opts)
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local fargs = opts.fargs or {}
+  local path_parts = {}
+  for i, v in ipairs(fargs) do
+    path_parts[i] = v
+  end
+
+  local mode = "full"
+  local n = #path_parts
+  if n > 0 then
+    local last = path_parts[n]:lower()
+    if last == "words" or last == "word" then
+      mode = "words"
+      table.remove(path_parts, n)
+    elseif last == "characters" or last == "chars" or last == "character" then
+      mode = "characters"
+      table.remove(path_parts, n)
+    end
+  end
+
+  local path_rel = nil
+  if #path_parts > 0 then
+    path_rel = table.concat(path_parts, " ")
+  end
+
+  local success, msg = obscli.wordcount_current({ path_rel = path_rel, mode = mode })
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, {
+  desc = "Obsidian wordcount (optional vault path; optional trailing words|characters)",
+  nargs = "*",
+})

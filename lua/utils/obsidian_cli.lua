@@ -510,6 +510,51 @@ function M.backlinks_counts_to_quickfix(path_rel)
   return true, string.format("Loaded %d backlink source(s) for %s.", #items, rel)
 end
 
+--- @param opts { path_rel?: string, mode?: "full"|"words"|"characters" }
+function M.wordcount_current(opts)
+  opts = opts or {}
+  local mode = opts.mode or "full"
+  if mode ~= "words" and mode ~= "characters" then
+    mode = "full"
+  end
+
+  local rel
+  if opts.path_rel and vim.trim(opts.path_rel) ~= "" then
+    rel = vim.trim(opts.path_rel)
+  else
+    local r, err = abs_to_vault_relpath(vim.api.nvim_buf_get_name(0))
+    if not r then
+      return false, err
+    end
+    rel = r
+  end
+
+  local cmdline = "obsidian wordcount path=" .. shellescape(rel)
+  if mode == "words" then
+    cmdline = cmdline .. " words"
+  elseif mode == "characters" then
+    cmdline = cmdline .. " characters"
+  end
+
+  local lines, run_err = run_obsidian_cli(cmdline)
+  if not lines then
+    return false, run_err
+  end
+
+  local text = vim.trim(table.concat(lines, "\n"))
+  if text == "" then
+    text = "(empty result)"
+  end
+
+  local long = #lines > 1 or (lines[1] and #lines[1] > 160)
+  if long then
+    open_scratch(string.format("ObsidianWordcount (%s): %s", mode, rel), lines)
+    return true, string.format("Opened wordcount (%s) for %s", mode, rel)
+  end
+
+  return true, text
+end
+
 function M.tasks_to_quickfix(opts)
   opts = opts or {}
   local only_todo = opts.only_todo ~= false
