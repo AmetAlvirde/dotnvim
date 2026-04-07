@@ -376,3 +376,32 @@ vim.api.nvim_create_user_command("ObsCLIOutline", function(opts)
     vim.notify(msg, vim.log.levels.INFO)
   end
 end, { desc = "Show Obsidian outline for current file (default format=tree)", nargs = "?" })
+
+-- ===================================================
+-- Obsidian CLI (commands-only; batch 2 feature #11)
+-- ===================================================
+
+vim.api.nvim_create_user_command("ObsCLIBacklinks", function(opts)
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local path_arg = opts.args
+  if path_arg and vim.trim(path_arg) == "" then
+    path_arg = nil
+  end
+
+  local success, msg = obscli.backlinks_counts_to_quickfix(path_arg)
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, {
+  desc = "List Obsidian backlinks with counts (JSON) into quickfix",
+  nargs = "?",
+})

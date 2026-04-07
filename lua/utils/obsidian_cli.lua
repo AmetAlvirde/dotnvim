@@ -357,6 +357,159 @@ function M.outline_current(opts)
   return true, string.format("Opened outline (%s) for %s", fmt, rel)
 end
 
+--- Decode `obsidian backlinks ... counts format=json` output; schema may vary by CLI version.
+local function try_decode_json_object(text)
+  text = vim.trim(text or "")
+  if text == "" then
+    return nil
+  end
+  local ok, data = pcall(vim.json.decode, text)
+  if ok and data ~= nil then
+    return data
+  end
+  local start = text:find("[%[%{]")
+  if start then
+    ok, data = pcall(vim.json.decode, text:sub(start))
+    if ok and data ~= nil then
+      return data
+    end
+  end
+  return nil
+end
+
+--- @return { path: string, count: integer }[]
+local function backlinks_json_to_rows(data)
+  local rows = {}
+
+  local function add(path, count)
+    path = vim.trim(tostring(path or ""))
+    if path == "" then
+      return
+    end
+    count = tonumber(count)
+    if not count or count < 1 then
+      count = 1
+    end
+    table.insert(rows, { path = path, count = count })
+  end
+
+  local function from_item(item)
+    if type(item) == "string" then
+      if vim.trim(item) ~= "" then
+        add(item, 1)
+      end
+      return
+    end
+    if type(item) ~= "table" then
+      return
+    end
+    local p = item.path or item.file or item.filePath or item.filepath or item.source or item.from or item.name
+    if type(p) ~= "string" then
+      return
+    end
+    local c = item.count or item.linkCount or item.links or item.total or item.n
+    add(p, c)
+  end
+
+  if type(data) ~= "table" then
+    return rows
+  end
+
+  if vim.tbl_islist(data) then
+    for _, item in ipairs(data) do
+      from_item(item)
+    end
+    return rows
+  end
+
+  local nested = data.backlinks or data.links or data.items or data.results or data.files
+  if type(nested) == "table" and vim.tbl_islist(nested) then
+    for _, item in ipairs(nested) do
+      from_item(item)
+    end
+    if #rows > 0 then
+      return rows
+    end
+  end
+
+  for k, v in pairs(data) do
+    if type(k) == "string" and k:match("%.md") and type(v) == "number" then
+      add(k, v)
+    elseif type(v) == "table" then
+      from_item(v)
+    elseif type(v) == "string" and v:match("%.md") then
+      add(v, 1)
+    end
+  end
+
+  return rows
+end
+
+--- List backlinks with per-source counts (CLI JSON) into quickfix.
+--- @param path_rel string|nil Vault-relative path; defaults to current buffer.
+function M.backlinks_counts_to_quickfix(path_rel)
+  local rel
+  if path_rel and vim.trim(path_rel) ~= "" then
+    rel = vim.trim(path_rel)
+  else
+    local r, err = abs_to_vault_relpath(vim.api.nvim_buf_get_name(0))
+    if not r then
+      return false, err
+    end
+    rel = r
+  end
+
+  local cmdline = "obsidian backlinks path=" .. shellescape(rel) .. " counts format=json"
+  local lines, run_err = run_obsidian_cli(cmdline)
+  if not lines then
+    return false, run_err
+  end
+
+  local text = table.concat(lines, "\n")
+  local data = try_decode_json_object(text)
+  if not data then
+    open_scratch("ObsidianBacklinksRawOutput", lines)
+    return true, "Could not parse backlinks JSON. Opened raw CLI output."
+  end
+
+  local rows = backlinks_json_to_rows(data)
+  if #rows == 0 then
+    open_scratch("ObsidianBacklinksRawOutput", lines)
+    return true, "No backlinks parsed from JSON. Opened raw CLI output."
+  end
+
+  local merged = {}
+  for _, row in ipairs(rows) do
+    merged[row.path] = (merged[row.path] or 0) + row.count
+  end
+  rows = {}
+  for p, c in pairs(merged) do
+    table.insert(rows, { path = p, count = c })
+  end
+
+  table.sort(rows, function(a, b)
+    return a.path:lower() < b.path:lower()
+  end)
+
+  local items = {}
+  for _, row in ipairs(rows) do
+    table.insert(items, {
+      filename = row.path,
+      lnum = 1,
+      col = 1,
+      text = string.format("count=%d  %s", row.count, row.path),
+    })
+  end
+
+  vim.fn.setqflist({}, " ", {
+    title = "Obsidian Backlinks (counts): " .. rel,
+    items = items,
+  })
+
+  vim.cmd("copen")
+  return true, string.format("Loaded %d backlink source(s) for %s.", #items, rel)
+end
+
 function M.tasks_to_quickfix(opts)
   opts = opts or {}
   local only_todo = opts.only_todo ~= false
