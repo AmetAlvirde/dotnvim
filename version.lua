@@ -1,6 +1,8 @@
-return {
-  version = "1.1.0",
-  build_date = "2025-12-15",
+  return {
+  version = "1.2.0",
+  build_date = "2026-04-07",
   neovim_min_version = "0.11.0",
-  description = "AmetAlvirde's personal dotNvim from scratch configuration"
+  description = "AmetAlvirde's personal dotNvim from scratch configuration",
+  obsidian_version = "1.12.7",
+  obsidian_installer_version="1.12.7",
 }
