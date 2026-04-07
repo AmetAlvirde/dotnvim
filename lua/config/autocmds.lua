@@ -350,3 +350,29 @@ vim.api.nvim_create_user_command("ObsCLIDiffFrom", function(opts)
     vim.notify(msg, vim.log.levels.INFO)
   end
 end, { desc = "Diff current file against a local history version", nargs = "?" })
+
+-- ===================================================
+-- Obsidian CLI (commands-only; batch 1 feature #8)
+-- ===================================================
+
+vim.api.nvim_create_user_command("ObsCLIOutline", function(opts)
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local fmt = opts.args
+  if not fmt or vim.trim(fmt) == "" then
+    fmt = "tree"
+  end
+
+  local success, msg = obscli.outline_current({ format = fmt })
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "Show Obsidian outline for current file (default format=tree)", nargs = "?" })

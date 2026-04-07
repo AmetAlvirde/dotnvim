@@ -331,6 +331,32 @@ function M.diff_current_from(version)
   return true, string.format("Opened diff from Local #%d for %s", v, rel)
 end
 
+--- @param opts { format?: string }
+function M.outline_current(opts)
+  opts = opts or {}
+  local fmt = vim.trim(opts.format or "tree")
+  if fmt == "" then
+    fmt = "tree"
+  end
+
+  local rel, err = abs_to_vault_relpath(vim.api.nvim_buf_get_name(0))
+  if not rel then
+    return false, err
+  end
+
+  local cmdline = "obsidian outline path=" .. shellescape(rel) .. " format=" .. fmt
+  local lines, run_err = run_obsidian_cli(cmdline)
+  if not lines then
+    return false, run_err
+  end
+
+  open_scratch(string.format("ObsidianOutline (%s): %s", fmt, rel), lines)
+  if fmt == "md" then
+    vim.bo.filetype = "markdown"
+  end
+  return true, string.format("Opened outline (%s) for %s", fmt, rel)
+end
+
 function M.tasks_to_quickfix(opts)
   opts = opts or {}
   local only_todo = opts.only_todo ~= false
