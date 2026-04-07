@@ -258,3 +258,30 @@ vim.api.nvim_create_user_command("ObsCLIUnresolved", function()
     vim.notify(msg, vim.log.levels.INFO)
   end
 end, { desc = "List Obsidian unresolved links (verbose) into quickfix" })
+
+-- ===================================================
+-- Obsidian CLI (commands-only; batch 1 feature #5)
+-- ===================================================
+
+vim.api.nvim_create_user_command("ObsCLISearchContext", function()
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local query = vim.fn.input("Obsidian search query: ")
+  if not query or vim.trim(query) == "" then
+    vim.notify("Search query required.", vim.log.levels.WARN)
+    return
+  end
+
+  local success, msg = obscli.search_context_to_quickfix(query)
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "Search Obsidian vault with context (quickfix)" })

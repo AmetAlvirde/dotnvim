@@ -205,6 +205,48 @@ function M.unresolved_to_quickfix()
   return true, string.format("Loaded %d unresolved link(s) into quickfix.", #items)
 end
 
+function M.search_context_to_quickfix(query)
+  query = vim.trim(query or "")
+  if query == "" then
+    return false, "Query is required."
+  end
+
+  local cmdline = "obsidian search:context query=" .. shellescape(query)
+  local lines, err = run_obsidian_cli(cmdline)
+  if not lines then
+    return false, err
+  end
+
+  local items = {}
+  for _, line in ipairs(lines or {}) do
+    local parsed = parse_path_line_text(line)
+    if parsed and parsed.path and parsed.lnum then
+      table.insert(items, {
+        filename = parsed.path,
+        lnum = parsed.lnum,
+        col = 1,
+        text = parsed.text ~= "" and parsed.text or line,
+      })
+    end
+  end
+
+  vim.fn.setqflist({}, " ", {
+    title = 'Obsidian Search Context: "' .. query .. '"',
+    items = items,
+  })
+
+  if #items == 0 then
+    if lines and #lines > 0 then
+      open_scratch("ObsidianSearchContextRawOutput", lines)
+      return true, "No search results parsed. Opened raw output buffer."
+    end
+    return true, "No matches."
+  end
+
+  vim.cmd("copen")
+  return true, string.format("Loaded %d match(es) into quickfix.", #items)
+end
+
 function M.tasks_to_quickfix(opts)
   opts = opts or {}
   local only_todo = opts.only_todo ~= false
