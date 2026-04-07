@@ -453,3 +453,45 @@ end, {
   desc = "Obsidian wordcount (optional vault path; optional trailing words|characters)",
   nargs = "*",
 })
+
+-- ===================================================
+-- Obsidian CLI (commands-only; batch 2 feature #15)
+-- ===================================================
+
+vim.api.nvim_create_user_command("ObsCLIBookmarks", function()
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local success, msg = obscli.bookmarks_list_verbose()
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "List Obsidian bookmarks (verbose) in a scratch buffer" })
+
+vim.api.nvim_create_user_command("ObsCLIBookmarkAdd", function(opts)
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local title = vim.trim(opts.args or "")
+  local success, msg = obscli.bookmark_add_current({ title = title ~= "" and title or nil })
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, {
+  desc = "Add Obsidian bookmark for current note (optional title as args, else prompt)",
+  nargs = "*",
+})

@@ -1,5 +1,11 @@
 local M = {}
 
+-- Keep in sync with `lua/plugins/obsidian.lua` workspaces.
+local VAULT_ROOTS = {
+  "/Users/amet/Writing/conscium",
+  "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
+}
+
 local function shellescape(s)
   return vim.fn.shellescape(s)
 end
@@ -114,13 +120,7 @@ local function abs_to_vault_relpath(abs_path)
     return nil, "Current buffer has no file path."
   end
 
-  -- Keep this in sync with `lua/plugins/obsidian.lua` workspaces.
-  local vault_roots = {
-    "/Users/amet/Writing/conscium",
-    "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
-  }
-
-  for _, root in ipairs(vault_roots) do
+  for _, root in ipairs(VAULT_ROOTS) do
     local real_root = vim.loop.fs_realpath(root) or root
     if abs_path:sub(1, #real_root) == real_root then
       local rel = abs_path:sub(#real_root + 1)
@@ -133,6 +133,55 @@ local function abs_to_vault_relpath(abs_path)
   end
 
   return nil, "File is not inside a known Obsidian vault root."
+end
+
+--- Resolve a vault-relative path (as returned by the CLI) to an absolute file path.
+--- @return string|nil
+local function vault_relpath_to_abs(rel)
+  if not rel or rel == "" then
+    return nil
+  end
+  rel = vim.trim(rel):gsub("^[\"'](.*)[\"']$", "%1")
+  if rel:sub(1, 1) == "/" then
+    local stat = vim.loop.fs_stat(rel)
+    if stat and stat.type == "file" then
+      return vim.loop.fs_realpath(rel) or rel
+    end
+    return nil
+  end
+  rel = rel:gsub("^/", ""):gsub("\\", "/")
+  for _, root in ipairs(VAULT_ROOTS) do
+    local real_root = vim.loop.fs_realpath(root) or root
+    local candidate = real_root .. "/" .. rel
+    local stat = vim.loop.fs_stat(candidate)
+    if stat and stat.type == "file" then
+      return vim.loop.fs_realpath(candidate) or candidate
+    end
+  end
+  return nil
+end
+
+--- Pick a note path from a `obsidian bookmarks verbose` line (TSV-ish; paths may be quoted).
+--- @return string|nil vault-relative or absolute path to a .md file
+local function extract_bookmark_note_path(line)
+  line = line or ""
+  local cells = vim.split(line, "\t", { plain = true })
+  for _, cell in ipairs(cells) do
+    cell = vim.trim(cell):gsub("^[\"'](.*)[\"']$", "%1")
+    if cell ~= "" and not cell:match("^https?:") then
+      if vault_relpath_to_abs(cell) then
+        return cell
+      end
+      if cell:match("%.md$") then
+        return cell
+      end
+    end
+  end
+  local md = line:match("([%w%-%._/]+)%.md")
+  if md then
+    return md .. ".md"
+  end
+  return nil
 end
 
 local function paths_to_quickfix(title, lines)
@@ -553,6 +602,66 @@ function M.wordcount_current(opts)
   end
 
   return true, text
+end
+
+function M.bookmarks_list_verbose()
+  local lines, err = run_obsidian_cli("obsidian bookmarks verbose")
+  if not lines then
+    return false, err
+  end
+
+  local buf = vim.api.nvim_create_buf(false, true)
+  vim.api.nvim_buf_set_name(buf, "ObsidianBookmarks")
+  vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
+  vim.bo[buf].filetype = "text"
+  vim.bo[buf].bufhidden = "wipe"
+  vim.bo[buf].swapfile = false
+  vim.cmd("botright split")
+  vim.api.nvim_win_set_buf(0, buf)
+
+  vim.keymap.set("n", "<CR>", function()
+    local ln = vim.api.nvim_get_current_line()
+    local rel = extract_bookmark_note_path(ln)
+    if not rel then
+      vim.notify("No note path found on this line.", vim.log.levels.WARN)
+      return
+    end
+    local abs = vault_relpath_to_abs(rel)
+    if not abs then
+      vim.notify("Could not resolve note path: " .. rel, vim.log.levels.ERROR)
+      return
+    end
+    vim.cmd("edit " .. vim.fn.fnameescape(abs))
+  end, { buffer = buf, desc = "Open bookmarked note" })
+
+  return true, string.format("Opened bookmarks list (%d line(s)). Press <CR> on a line to open.", #lines)
+end
+
+--- @param opts { title?: string }
+function M.bookmark_add_current(opts)
+  opts = opts or {}
+  local rel, path_err = abs_to_vault_relpath(vim.api.nvim_buf_get_name(0))
+  if not rel then
+    return false, path_err
+  end
+
+  local cmdline = "obsidian bookmark file=" .. shellescape(rel)
+  local t = opts.title and vim.trim(opts.title) or ""
+  if t ~= "" then
+    cmdline = cmdline .. " title=" .. shellescape(t)
+  end
+
+  local out_lines, run_err = run_obsidian_cli(cmdline)
+  if run_err then
+    return false, run_err
+  end
+
+  local suffix = ""
+  if out_lines and #out_lines > 0 then
+    suffix = "\n" .. table.concat(out_lines, "\n")
+  end
+  local msg = "Bookmark added for " .. rel .. (t ~= "" and (' title="' .. t .. '"') or "") .. suffix
+  return true, vim.trim(msg)
 end
 
 function M.tasks_to_quickfix(opts)
