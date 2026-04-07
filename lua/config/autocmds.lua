@@ -285,3 +285,68 @@ vim.api.nvim_create_user_command("ObsCLISearchContext", function()
     vim.notify(msg, vim.log.levels.INFO)
   end
 end, { desc = "Search Obsidian vault with context (quickfix)" })
+
+-- ===================================================
+-- Obsidian CLI (commands-only; batch 1 feature #6)
+-- ===================================================
+
+vim.api.nvim_create_user_command("ObsCLIHistory", function()
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local success, msg = obscli.history_list_current()
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "Show Obsidian local history for current file" })
+
+vim.api.nvim_create_user_command("ObsCLIHistoryRead", function(opts)
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local v = opts.args
+  if not v or vim.trim(v) == "" then
+    v = vim.fn.input("History version to read (number): ")
+  end
+
+  local success, msg = obscli.history_read_current(v)
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "Read a local history version for current file", nargs = "?" })
+
+vim.api.nvim_create_user_command("ObsCLIDiffFrom", function(opts)
+  local ok, obscli = pcall(require, "utils.obsidian_cli")
+  if not ok then
+    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
+    return
+  end
+
+  local v = opts.args
+  if not v or vim.trim(v) == "" then
+    v = vim.fn.input("Diff from local history version (number): ")
+  end
+
+  local success, msg = obscli.diff_current_from(v)
+  if not success then
+    vim.notify(msg, vim.log.levels.ERROR)
+    return
+  end
+  if msg and msg ~= "" then
+    vim.notify(msg, vim.log.levels.INFO)
+  end
+end, { desc = "Diff current file against a local history version", nargs = "?" })

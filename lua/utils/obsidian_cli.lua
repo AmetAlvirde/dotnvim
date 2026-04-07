@@ -108,6 +108,33 @@ local function open_scratch(title, lines)
   vim.api.nvim_win_set_buf(0, buf)
 end
 
+local function abs_to_vault_relpath(abs_path)
+  abs_path = abs_path and vim.loop.fs_realpath(abs_path) or abs_path
+  if not abs_path or abs_path == "" then
+    return nil, "Current buffer has no file path."
+  end
+
+  -- Keep this in sync with `lua/plugins/obsidian.lua` workspaces.
+  local vault_roots = {
+    "/Users/amet/Writing/conscium",
+    "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
+  }
+
+  for _, root in ipairs(vault_roots) do
+    local real_root = vim.loop.fs_realpath(root) or root
+    if abs_path:sub(1, #real_root) == real_root then
+      local rel = abs_path:sub(#real_root + 1)
+      rel = rel:gsub("^/", "")
+      if rel == "" then
+        return nil, "Buffer path is the vault root, not a file."
+      end
+      return rel, nil
+    end
+  end
+
+  return nil, "File is not inside a known Obsidian vault root."
+end
+
 local function paths_to_quickfix(title, lines)
   local items = {}
   for _, line in ipairs(lines or {}) do
@@ -245,6 +272,63 @@ function M.search_context_to_quickfix(query)
 
   vim.cmd("copen")
   return true, string.format("Loaded %d match(es) into quickfix.", #items)
+end
+
+function M.history_list_current()
+  local rel, err = abs_to_vault_relpath(vim.api.nvim_buf_get_name(0))
+  if not rel then
+    return false, err
+  end
+
+  local lines, run_err = run_obsidian_cli("obsidian history path=" .. shellescape(rel))
+  if not lines then
+    return false, run_err
+  end
+
+  open_scratch("ObsidianHistory: " .. rel, lines)
+  return true, "Opened history list for " .. rel
+end
+
+function M.history_read_current(version)
+  local rel, err = abs_to_vault_relpath(vim.api.nvim_buf_get_name(0))
+  if not rel then
+    return false, err
+  end
+
+  local v = tonumber(version, 10) or 1
+  local lines, run_err = run_obsidian_cli(
+    "obsidian history:read path=" .. shellescape(rel) .. " version=" .. tostring(v)
+  )
+  if not lines then
+    return false, run_err
+  end
+
+  open_scratch(string.format("ObsidianHistoryRead v%d: %s", v, rel), lines)
+  return true, string.format("Opened version %d for %s", v, rel)
+end
+
+function M.diff_current_from(version)
+  local rel, err = abs_to_vault_relpath(vim.api.nvim_buf_get_name(0))
+  if not rel then
+    return false, err
+  end
+
+  local v = tonumber(version, 10)
+  if not v then
+    return false, "Version number is required."
+  end
+
+  local lines, run_err = run_obsidian_cli(
+    "obsidian diff path=" .. shellescape(rel) .. " from=" .. tostring(v)
+  )
+  if not lines then
+    return false, run_err
+  end
+
+  open_scratch(string.format("ObsidianDiff Local#%d: %s", v, rel), lines)
+  -- Mark buffer as diff for nicer highlighting.
+  vim.bo.filetype = "diff"
+  return true, string.format("Opened diff from Local #%d for %s", v, rel)
 end
 
 function M.tasks_to_quickfix(opts)
