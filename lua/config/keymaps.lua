@@ -102,7 +102,7 @@ keymap("n", "<leader>tr", function()
 end, { desc = "Theme refresh lualine" })
 
 -- Emmet keymaps
-keymap("i", "<C-y>,", "<Plug>(emmet-expand-abbr)", { desc = "Expand Emmet abbreviation" })
+keymap("i", "<C-y>y", "<Plug>(emmet-expand-abbr)", { desc = "Expand Emmet abbreviation" })
 keymap("i", "<C-y>;", "<Plug>(emmet-expand-word)", { desc = "Expand Emmet word" })
 keymap("i", "<C-y>d", "<Plug>(emmet-balance-tag-inward)", { desc = "Balance tag inward" })
 keymap("i", "<C-y>D", "<Plug>(emmet-balance-tag-outward)", { desc = "Balance tag outward" })

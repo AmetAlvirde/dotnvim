@@ -226,7 +226,7 @@ All git tooling lives under `<leader>g`, grouped by sub-namespace.
 
 | Key | Action |
 |-----|--------|
-| `<C-y>,` | Expand abbreviation |
+| `<C-y>y` | Expand abbreviation |
 | `<C-y>;` | Expand word |
 | `<C-y>d` / `D` | Balance tag inward / outward |
 | `<C-y>n` / `N` | Move to next / previous edit point |
