@@ -9,9 +9,9 @@ return {
     vim.keymap.set('n', '<leader>gp', ':Git push<CR>', { desc = 'Git push' })
     vim.keymap.set('n', '<leader>gl', ':Git pull<CR>', { desc = 'Git pull' })
     vim.keymap.set('n', '<leader>gb', ':Git blame<CR>', { desc = 'Git blame' })
-    vim.keymap.set('n', '<leader>gd', ':Gdiffsplit<CR>', { desc = 'Git diff split' })
-    vim.keymap.set('n', '<leader>gw', ':Gwrite<CR>', { desc = 'Git write (stage)' })
-    vim.keymap.set('n', '<leader>gr', ':Gread<CR>', { desc = 'Git read (checkout)' })
+    vim.keymap.set('n', '<leader>gd', ':Gdiffsplit<CR>', { desc = 'Git diff' })
+    vim.keymap.set('n', '<leader>gw', ':Gwrite<CR>', { desc = 'Git write (stage file)' })
+    vim.keymap.set('n', '<leader>gr', ':Gread<CR>', { desc = 'Git read (checkout file)' })
   end,
 }
 
