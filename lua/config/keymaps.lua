@@ -184,13 +184,8 @@ end, { desc = "Go to last buffer" })
 
 -- Global function to enter Obsidian workspace
 local function enter_obsidian_workspace(workspace_name)
-  local workspaces = {
-    conscium = "/Users/amet/Writing/conscium",
-    cronicasDeUnCorredorComoTu = "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
-  }
-  
-  local path = workspaces[workspace_name]
-  if not path then
+  local vault = require("config.vaults").get(workspace_name)
+  if not vault or not vault.path then
     vim.notify("Unknown workspace: " .. (workspace_name or "nil"), vim.log.levels.ERROR)
     return
   end
@@ -205,7 +200,7 @@ local function enter_obsidian_workspace(workspace_name)
   end
   
   -- Change to the workspace directory
-  vim.cmd('cd ' .. path)
+  vim.cmd("cd " .. vault.path)
   -- Open the workspace in Neo-tree (file explorer)
   -- vim.cmd('Neotree filesystem show right')
   vim.notify('Entered Obsidian workspace: ' .. workspace_name)

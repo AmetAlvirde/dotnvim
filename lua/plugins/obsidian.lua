@@ -8,6 +8,8 @@ return {
     "nvim-lua/plenary.nvim",
   },
   config = function()
+    local vaults = require("config.vaults")
+
     --- Timezone suffix for frontmatter, e.g. "(GMT-6)" or "(GMT+5:30)".
     --- Uses strftime %z (RFC 822 style) so offset matches the system clock.
     local function get_tz_offset()
@@ -25,16 +27,7 @@ return {
     end
 
     require("obsidian").setup({
-      workspaces = {
-        {
-          name = "conscium",
-          path = "/Users/amet/Writing/conscium",
-        },
-        {
-          name = "cronicasDeUnCorredorComoTu",
-          path = "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
-        },
-      },
+      workspaces = vaults.workspaces,
       
       -- Remove notes_subdir to keep notes in root
       -- notes_subdir = "notes",

@@ -1,10 +1,6 @@
 local M = {}
 
--- Keep in sync with `lua/plugins/obsidian.lua` workspaces.
-local VAULT_ROOTS = {
-  "/Users/amet/Writing/conscium",
-  "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
-}
+local VAULT_ROOTS = require("config.vaults").paths()
 
 local function shellescape(s)
   return vim.fn.shellescape(s)

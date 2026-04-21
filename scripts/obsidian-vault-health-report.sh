@@ -35,7 +35,7 @@ Options:
   --stdout             Print report to stdout (default)
   --write[=PATH]       Write report to PATH. If PATH is omitted, write to:
                        ./vault-health-YYYY-MM-DD.md
-  --vault=NAME         Vault key: conscium | cronicasDeUnCorredorComoTu (see lua/plugins/obsidian.lua)
+  --vault=NAME         Vault key: conscium | cronicasDeUnCorredorComoTu (see lua/config/vaults.lua)
   -h, --help           Show help
 
   OBSIDIAN_VAULT_ROOT=/abs/path      Use this vault directory (overrides --vault path lookup)
@@ -70,7 +70,7 @@ for arg in "$@"; do
   esac
 done
 
-# Paths must match lua/plugins/obsidian.lua workspaces[].path
+# Paths must match lua/config/vaults.lua
 resolve_vault_root() {
   case "$VAULT_NAME" in
     conscium) echo "/Users/amet/Writing/conscium" ;;
