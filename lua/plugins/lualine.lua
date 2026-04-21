@@ -6,54 +6,11 @@ return {
     "nvim-tree/nvim-web-devicons",
   },
   config = function()
-    -- Import your custom Solarized colors
-    local solarized_colors = require("colors.solarized")
-    
-    -- Function to get current theme colors
-    local function get_colors()
-      local theme = vim.o.background == "dark" and "dark" or "light"
-      if theme == "dark" then
-        return {
-          bg0 = "#002d38",  -- base03
-          bg1 = "#093946",  -- base02
-          bg2 = "#5b7279",  -- base01
-          fg0 = "#98a8a8",  -- base0
-          fg1 = "#8faaab",  -- base1
-          fg2 = "#657377",  -- base00
-          fg3 = "#5b7279",  -- base01
-          yellow = "#ac8300",
-          orange = "#d56500",
-          red = "#f23749",
-          magenta = "#dd459d",
-          violet = "#7d80d1",
-          blue = "#2b90d8",
-          cyan = "#259d94",
-          green = "#819500",
-        }
-      else
-        return {
-          bg0 = "#fbf7ef",  -- base3
-          bg1 = "#f1e9d2",  -- base2
-          bg2 = "#8faaab",  -- base1
-          fg0 = "#657377",  -- base00
-          fg1 = "#5b7279",  -- base01
-          fg2 = "#093946",  -- base02
-          fg3 = "#002d38",  -- base03
-          yellow = "#ac8300",
-          orange = "#d56500",
-          red = "#f23749",
-          magenta = "#dd459d",
-          violet = "#7d80d1",
-          blue = "#2b90d8",
-          cyan = "#259d94",
-          green = "#819500",
-        }
-      end
-    end
+    local solarized = require("colors.solarized")
 
     -- Custom Solarized theme for lualine
     local function create_solarized_theme()
-      local c = get_colors()
+      local c = (vim.o.background == "dark") and solarized.dark_colors or solarized.light_colors
       return {
         normal = {
           a = { fg = c.bg0, bg = c.blue, gui = 'bold' },
