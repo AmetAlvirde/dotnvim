@@ -407,6 +407,26 @@ end, {
 })
 
 -- ===================================================
+-- Buffer word count (whitespace-separated words)
+-- ===================================================
+
+vim.api.nvim_create_user_command("WordCount", function(opts)
+  local ok, wc = pcall(require, "utils.wordcount")
+  if not ok then
+    vim.notify("Failed to load utils.wordcount", vim.log.levels.ERROR)
+    return
+  end
+  local n = wc.buf_line_range_wordcount(0, opts.line1, opts.line2)
+  vim.notify(
+    string.format("%d word%s (lines %d–%d)", n, n == 1 and "" or "s", opts.line1, opts.line2),
+    vim.log.levels.INFO
+  )
+end, {
+  range = true,
+  desc = "Count whitespace-separated words in range (default: current line; use % or '<,'>)",
+})
+
+-- ===================================================
 -- Obsidian CLI (commands-only; batch 2 feature #13)
 -- ===================================================
 
