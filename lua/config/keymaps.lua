@@ -51,20 +51,6 @@ keymap("n", "<leader>ct", "<cmd>checktime<cr>", { desc = "Check if file was modi
 -- reload file from disk
 keymap("n", "<leader>r", "<cmd>e!<cr>", { desc = "Reload file from disk" })
 
--- Solarized theme toggle
-keymap("n", "<leader>tt", function()
-  require("colors.solarized").toggle()
-end, { desc = "Toggle Solarized theme (dark/light)" })
-
--- Manual lualine refresh (for debugging)
-keymap("n", "<leader>tr", function()
-  if vim.fn.exists(':LualineRefresh') == 2 then
-    vim.cmd("LualineRefresh")
-  else
-    print("LualineRefresh command not available")
-  end
-end, { desc = "Refresh lualine theme manually" })
-
 -- format file
 keymap("n", "<leader>f", function()
   require("conform").format({ async = true, lsp_fallback = true })
@@ -103,10 +89,17 @@ keymap("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 keymap("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 keymap("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
--- Solarized theme toggle
-keymap("n", "<leader>tt", "<cmd>SolarizedToggle<cr>", { desc = "Toggle Solarized theme" })
-keymap("n", "<leader>td", "<cmd>SolarizedDark<cr>", { desc = "Set Solarized dark" })
-keymap("n", "<leader>tl", "<cmd>SolarizedLight<cr>", { desc = "Set Solarized light" })
+-- Solarized theme controls (use <leader>T… to avoid clashing with gitsigns on <leader>t…)
+keymap("n", "<leader>Tt", "<cmd>SolarizedToggle<cr>", { desc = "Toggle Solarized theme" })
+keymap("n", "<leader>Td", "<cmd>SolarizedDark<cr>", { desc = "Set Solarized dark" })
+keymap("n", "<leader>Tl", "<cmd>SolarizedLight<cr>", { desc = "Set Solarized light" })
+keymap("n", "<leader>Tr", function()
+  if vim.fn.exists(":LualineRefresh") == 2 then
+    vim.cmd("LualineRefresh")
+  else
+    print("LualineRefresh command not available")
+  end
+end, { desc = "Refresh lualine theme manually" })
 
 -- Emmet keymaps
 keymap("i", "<C-y>,", "<Plug>(emmet-expand-abbr)", { desc = "Expand Emmet abbreviation" })
