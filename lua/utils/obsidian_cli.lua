@@ -1,10 +1,6 @@
 local M = {}
 
--- Keep in sync with `lua/plugins/obsidian.lua` workspaces.
-local VAULT_ROOTS = {
-  "/Users/amet/Writing/conscium",
-  "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
-}
+local VAULT_ROOTS = require("config.vaults").paths()
 
 local function shellescape(s)
   return vim.fn.shellescape(s)
@@ -664,6 +660,65 @@ function M.bookmark_add_current(opts)
   return true, vim.trim(msg)
 end
 
+local function find_quickfix_win()
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    local w = vim.fn.getwininfo(win)[1]
+    if w and w.quickfix == 1 and w.loclist == 0 then
+      return win
+    end
+  end
+  return nil
+end
+
+--- Find quickfix row index for a task ref (`path.md:line`) after reload.
+--- @param ref string
+--- @return integer|nil
+local function qf_idx_for_task_ref(ref)
+  if not ref or ref == "" then
+    return nil
+  end
+  local items = vim.fn.getqflist()
+  for i, item in ipairs(items) do
+    local ud = item.user_data
+    if type(ud) == "table" and ud.obsidian_task_ref == ref then
+      return i
+    end
+  end
+  local path, lnum_s = ref:match("^(.-):(%d+)$")
+  local lnum = path and tonumber(lnum_s, 10) or nil
+  if path and lnum then
+    for i, item in ipairs(items) do
+      if item.filename == path and item.lnum == lnum then
+        return i
+      end
+    end
+    local tail = path:match("[^/]+$") or path
+    for i, item in ipairs(items) do
+      local fname = item.filename or ""
+      local tail_ok = tail ~= "" and #fname >= #tail and fname:sub(-#tail) == tail
+      if item.lnum == lnum and (fname == path or tail_ok) then
+        return i
+      end
+    end
+  end
+  return nil
+end
+
+--- Sync quickfix index and cursor to the row for `ref` (after list rebuild).
+local function qf_focus_row_for_task_ref(ref)
+  local idx = qf_idx_for_task_ref(ref)
+  if not idx then
+    return
+  end
+  vim.fn.setqflist({}, "a", { idx = idx })
+  local win = find_quickfix_win()
+  if win then
+    vim.api.nvim_set_current_win(win)
+    vim.api.nvim_win_set_cursor(win, { idx, 0 })
+  end
+end
+
+--- @param opts { only_todo?: boolean, keep_task_ref?: string }
 function M.tasks_to_quickfix(opts)
   opts = opts or {}
   local only_todo = opts.only_todo ~= false
@@ -696,15 +751,31 @@ function M.tasks_to_quickfix(opts)
   end
 
   vim.cmd("copen")
+  if opts.keep_task_ref and type(opts.keep_task_ref) == "string" and opts.keep_task_ref ~= "" then
+    qf_focus_row_for_task_ref(opts.keep_task_ref)
+  end
   return true, string.format("Loaded %d task(s) into quickfix.", #items)
 end
 
 local function get_current_qf_item()
-  local qf = vim.fn.getqflist({ idx = 0, items = 0 })
-  local idx = qf and qf.idx or 0
-  local items = qf and qf.items or {}
-  local item = items[idx]
-  return item
+  local items = vim.fn.getqflist()
+  if not items or #items == 0 then
+    return nil
+  end
+
+  local idx
+  local wininfo = vim.fn.getwininfo(vim.fn.win_getid())[1] or {}
+  -- Cursor position in the quickfix window does not update `idx`; use line('.') here.
+  if wininfo.quickfix == 1 and wininfo.loclist == 0 then
+    idx = vim.fn.line(".")
+  else
+    idx = vim.fn.getqflist({ idx = 0 }).idx or 0
+  end
+
+  if idx < 1 or idx > #items then
+    return nil
+  end
+  return items[idx]
 end
 
 function M.toggle_task_from_quickfix()
@@ -735,8 +806,8 @@ function M.toggle_task_from_quickfix()
     return false, err
   end
 
-  -- Reload list so status reflects changes.
-  M.tasks_to_quickfix({ only_todo = false })
+  -- Reload list so status reflects changes; keep cursor on this task row.
+  M.tasks_to_quickfix({ only_todo = false, keep_task_ref = ref })
   return true, "Toggled task: " .. ref
 end
 

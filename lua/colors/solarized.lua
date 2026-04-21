@@ -26,6 +26,8 @@ local colors = {
   green    = "#819500",
 }
 
+M.colors = colors
+
 -- Function to detect OS theme
 local function get_os_theme()
   if vim.fn.has("mac") == 1 then
@@ -71,6 +73,8 @@ local dark_colors = {
   green = colors.green,
 }
 
+M.dark_colors = dark_colors
+
 -- Light theme colors  
 local light_colors = {
   bg0 = colors.base3,
@@ -91,6 +95,8 @@ local light_colors = {
   cyan = colors.cyan,
   green = colors.green,
 }
+
+M.light_colors = light_colors
 
 -- Function to apply colorscheme
 function M.setup()
