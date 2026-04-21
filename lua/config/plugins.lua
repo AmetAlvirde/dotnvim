@@ -27,10 +27,6 @@ table.insert(plugins, require("plugins.conform"))
 table.insert(plugins, require("plugins.luasnip"))
 table.insert(plugins, require("plugins.friendly-snippets"))
 table.insert(plugins, require("plugins.nvim-cmp"))
-table.insert(plugins, require("plugins.cmp-nvim-lsp"))
-table.insert(plugins, require("plugins.cmp-buffer"))
-table.insert(plugins, require("plugins.cmp-path"))
-table.insert(plugins, require("plugins.cmp-luasnip"))
 table.insert(plugins, require("plugins.nvim-autopairs"))
 
 -- Treesitter plugins
