@@ -80,6 +80,23 @@ With this configuration, you get an nvim environment with:
 - **Rainbow Delimiters**: Color-coded brackets and parentheses
 - **Template Literals**: Custom highlighting for HTML/CSS in JS template strings
 
+## Keymaps
+
+All keymaps follow a **mnemonic namespace strategy**: every `<leader>` key sequence starts with a prefix that names its domain, so the mapping reads like a sentence. See [docs/keymaps.md](docs/keymaps.md) for the full reference.
+
+| Prefix | Domain |
+|--------|--------|
+| `<leader>b` | **B**uffer — reload, checktime |
+| `<leader>c` | **C**ode — LSP actions, format, rename |
+| `<leader>d` | **D**iagnostics — float, list |
+| `<leader>e` | **E**xplorer — Neo-tree |
+| `<leader>f` | **F**ind — Telescope |
+| `<leader>g` | **G**it — all git tools (fugitive, lazygit, hunks, diffview) |
+| `<leader>o` | **O**bsidian — notes and workspaces |
+| `<leader>t` | **T**heme / toggles |
+| `<leader>w` | **W**indow — splits |
+| `<leader>q` | **Q**uit |
+
 ## Installation
 
 ### Prerequisites

@@ -174,12 +174,12 @@ return {
       },
     })
 
-    -- Keymaps for Diffview commands
-    vim.keymap.set('n', '<leader>dv', ':DiffviewOpen<CR>', { desc = 'Open Diffview' })
-    vim.keymap.set('n', '<leader>dc', ':DiffviewClose<CR>', { desc = 'Close Diffview' })
-    vim.keymap.set('n', '<leader>dh', ':DiffviewFileHistory<CR>', { desc = 'File history' })
-    vim.keymap.set('n', '<leader>df', ':DiffviewFileHistory %<CR>', { desc = 'Current file history' })
-    vim.keymap.set('n', '<leader>dr', ':DiffviewRefresh<CR>', { desc = 'Refresh Diffview' })
+    -- Keymaps for Diffview commands (git view)
+    vim.keymap.set('n', '<leader>gvo', ':DiffviewOpen<CR>', { desc = 'Git view open' })
+    vim.keymap.set('n', '<leader>gvc', ':DiffviewClose<CR>', { desc = 'Git view close' })
+    vim.keymap.set('n', '<leader>gvh', ':DiffviewFileHistory<CR>', { desc = 'Git view history' })
+    vim.keymap.set('n', '<leader>gvf', ':DiffviewFileHistory %<CR>', { desc = 'Git view file history' })
+    vim.keymap.set('n', '<leader>gvr', ':DiffviewRefresh<CR>', { desc = 'Git view refresh' })
   end,
 }
 

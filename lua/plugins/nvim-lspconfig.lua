@@ -28,18 +28,18 @@ return {
         
         -- Code actions and refactoring
         vim.keymap.set({ 'n', 'v' }, '<leader>ca', vim.lsp.buf.code_action, vim.tbl_extend('force', opts, { desc = 'Code action' }))
-        vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, vim.tbl_extend('force', opts, { desc = 'Rename symbol' }))
-        
+        vim.keymap.set('n', '<leader>cr', vim.lsp.buf.rename, vim.tbl_extend('force', opts, { desc = 'Code rename symbol' }))
+
         -- Formatting
-        vim.keymap.set('n', '<leader>f', function()
+        vim.keymap.set('n', '<leader>cf', function()
           vim.lsp.buf.format({ async = true })
-        end, vim.tbl_extend('force', opts, { desc = 'Format document' }))
-        
+        end, vim.tbl_extend('force', opts, { desc = 'Code format' }))
+
         -- Diagnostics navigation
-        vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, vim.tbl_extend('force', opts, { desc = 'Go to previous diagnostic' }))
-        vim.keymap.set('n', ']d', vim.diagnostic.goto_next, vim.tbl_extend('force', opts, { desc = 'Go to next diagnostic' }))
-        vim.keymap.set('n', '<leader>d', vim.diagnostic.open_float, vim.tbl_extend('force', opts, { desc = 'Show diagnostic' }))
-        vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, vim.tbl_extend('force', opts, { desc = 'Open diagnostics list' }))
+        vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, vim.tbl_extend('force', opts, { desc = 'Diagnostic prev' }))
+        vim.keymap.set('n', ']d', vim.diagnostic.goto_next, vim.tbl_extend('force', opts, { desc = 'Diagnostic next' }))
+        vim.keymap.set('n', '<leader>dd', vim.diagnostic.open_float, vim.tbl_extend('force', opts, { desc = 'Diagnostic display' }))
+        vim.keymap.set('n', '<leader>dl', vim.diagnostic.setloclist, vim.tbl_extend('force', opts, { desc = 'Diagnostic list' }))
       end,
     })
     
@@ -113,9 +113,21 @@ return {
         },
       },
     })
+
+    -- Configure emmet-language-server
+    vim.lsp.config('emmet_language_server', {
+      cmd = { 'emmet-language-server', '--stdio' },
+      filetypes = {
+        'html', 'css', 'scss', 'less',
+        'javascript', 'javascriptreact',
+        'typescript', 'typescriptreact',
+      },
+      root_markers = { '.git', 'package.json' },
+    })
     
     -- Enable ts_ls
     vim.lsp.enable('ts_ls')
+    vim.lsp.enable('emmet_language_server')
   end,
 }
 

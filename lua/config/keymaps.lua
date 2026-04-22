@@ -45,26 +45,26 @@ keymap({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" 
 -- force save file (overwrite external changes)
 keymap({ "i", "v", "n", "s" }, "<C-S>", "<cmd>w!<cr><esc>", { desc = "Force save file" })
 
--- check if file was modified externally
-keymap("n", "<leader>ct", "<cmd>checktime<cr>", { desc = "Check if file was modified externally" })
+-- buffer: check if file was modified externally
+keymap("n", "<leader>bc", "<cmd>checktime<cr>", { desc = "Buffer check (external changes)" })
 
--- reload file from disk
-keymap("n", "<leader>r", "<cmd>e!<cr>", { desc = "Reload file from disk" })
+-- buffer: reload file from disk
+keymap("n", "<leader>br", "<cmd>e!<cr>", { desc = "Buffer reload from disk" })
 
--- format file
-keymap("n", "<leader>f", function()
+-- code: format file
+keymap("n", "<leader>cf", function()
   require("conform").format({ async = true, lsp_fallback = true })
-end, { desc = "Format file" })
+end, { desc = "Code format" })
 
--- format markdown with hard line breaks
-keymap("n", "<leader>fm", function()
+-- code: format markdown with hard line breaks
+keymap("n", "<leader>cm", function()
   if vim.bo.filetype == "markdown" then
     -- Format with Prettier for markdown with hard line breaks
     vim.cmd(":%!prettier --print-width 80 --prose-wrap always --tab-width 2 --stdin-filepath " .. vim.fn.expand("%"))
   else
     require("conform").format({ async = true, lsp_fallback = true })
   end
-end, { desc = "Format markdown with hard line breaks" })
+end, { desc = "Code format markdown (hard line breaks)" })
 
 -- QuickFix
 keymap("n", "]q", "<cmd>cnext<cr>", { desc = "Next quickfix" })
@@ -89,34 +89,17 @@ keymap("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 keymap("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 keymap("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
--- Solarized theme controls (use <leader>T… to avoid clashing with gitsigns on <leader>t…)
-keymap("n", "<leader>Tt", "<cmd>SolarizedToggle<cr>", { desc = "Toggle Solarized theme" })
-keymap("n", "<leader>Td", "<cmd>SolarizedDark<cr>", { desc = "Set Solarized dark" })
-keymap("n", "<leader>Tl", "<cmd>SolarizedLight<cr>", { desc = "Set Solarized light" })
-keymap("n", "<leader>Tr", function()
+-- Theme controls
+keymap("n", "<leader>tt", "<cmd>SolarizedToggle<cr>", { desc = "Theme toggle" })
+keymap("n", "<leader>td", "<cmd>SolarizedDark<cr>", { desc = "Theme dark" })
+keymap("n", "<leader>tl", "<cmd>SolarizedLight<cr>", { desc = "Theme light" })
+keymap("n", "<leader>tr", function()
   if vim.fn.exists(":LualineRefresh") == 2 then
     vim.cmd("LualineRefresh")
   else
     print("LualineRefresh command not available")
   end
-end, { desc = "Refresh lualine theme manually" })
-
--- Emmet keymaps
-keymap("i", "<C-y>,", "<Plug>(emmet-expand-abbr)", { desc = "Expand Emmet abbreviation" })
-keymap("i", "<C-y>;", "<Plug>(emmet-expand-word)", { desc = "Expand Emmet word" })
-keymap("i", "<C-y>d", "<Plug>(emmet-balance-tag-inward)", { desc = "Balance tag inward" })
-keymap("i", "<C-y>D", "<Plug>(emmet-balance-tag-outward)", { desc = "Balance tag outward" })
-keymap("i", "<C-y>n", "<Plug>(emmet-move-next)", { desc = "Move to next edit point" })
-keymap("i", "<C-y>N", "<Plug>(emmet-move-prev)", { desc = "Move to previous edit point" })
-keymap("i", "<C-y>i", "<Plug>(emmet-image-size)", { desc = "Update image size" })
-keymap("i", "<C-y>I", "<Plug>(emmet-image-encode)", { desc = "Encode image" })
-keymap("i", "<C-y>j", "<Plug>(emmet-split-join-tag)", { desc = "Split/join tag" })
-keymap("i", "<C-y>k", "<Plug>(emmet-remove-tag)", { desc = "Remove tag" })
-keymap("i", "<C-y>/", "<Plug>(emmet-toggle-comment)", { desc = "Toggle comment" })
-keymap("i", "<C-y>a", "<Plug>(emmet-anchorize-url)", { desc = "Anchorize URL" })
-keymap("i", "<C-y>A", "<Plug>(emmet-anchorize-summary)", { desc = "Anchorize summary" })
-keymap("i", "<C-y>m", "<Plug>(emmet-merge-lines)", { desc = "Merge lines" })
-keymap("i", "<C-y>c", "<Plug>(emmet-code-pretty)", { desc = "Pretty code" })
+end, { desc = "Theme refresh lualine" })
 
 -- ===================================================
 -- File Explorer Keymaps
@@ -138,17 +121,17 @@ keymap("n", "<leader>ff", function()
 end, { desc = "Find files in current directory" })
 
 -- Find files in git project root
-keymap("n", "<leader>fp", function()
+keymap("n", "<leader>fg", function()
   require("telescope.builtin").git_files()
-end, { desc = "Find files in git project root" })
+end, { desc = "Find git files" })
 
 -- Find recent buffers with Telescope
-keymap("n", "<leader>fr", function()
+keymap("n", "<leader>fb", function()
   require("telescope.builtin").buffers({
     sort_mru = true,
     ignore_current_buffer = true,
   })
-end, { desc = "Find recent buffers" })
+end, { desc = "Find buffers" })
 
 -- Go to last buffer (immediately switch to most recently used buffer)
 keymap("n", "<leader>fl", function()

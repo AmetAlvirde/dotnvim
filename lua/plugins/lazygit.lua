@@ -7,10 +7,9 @@ return {
     "nvim-lua/plenary.nvim",
   },
   config = function()
-    vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "Open LazyGit" })
-    vim.keymap.set("n", "<leader>gf", ":LazyGitFilter<CR>", { desc = "Open LazyGit (filtered)" })
-    vim.keymap.set("n", "<leader>gc", ":LazyGitConfig<CR>", { desc = "Open LazyGit config" })
-    vim.keymap.set("n", "<leader>gF", ":LazyGitFilterCurrentFile<CR>", { desc = "Open LazyGit (current file)" })
+    vim.keymap.set("n", "<leader>gg", ":LazyGit<CR>", { desc = "Git LazyGit" })
+    vim.keymap.set("n", "<leader>gf", ":LazyGitFilter<CR>", { desc = "Git filter (LazyGit)" })
+    vim.keymap.set("n", "<leader>gF", ":LazyGitFilterCurrentFile<CR>", { desc = "Git filter file (LazyGit)" })
   end,
 }
 

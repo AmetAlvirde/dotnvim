@@ -7,7 +7,6 @@ table.insert(plugins, require("plugins.vim-styled-components"))
 table.insert(plugins, require("plugins.vim-javascript"))
 table.insert(plugins, require("plugins.vim-jsx-pretty"))
 table.insert(plugins, require("plugins.typescript-vim"))
-table.insert(plugins, require("plugins.emmet-vim"))
 
 -- File explorer plugins
 table.insert(plugins, require("plugins.neo-tree"))
