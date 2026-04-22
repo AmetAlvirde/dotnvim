@@ -8,7 +8,7 @@ Rules:
 - One prefix, one purpose — no prefix does double duty.
 - LSP go-to keys (`gd`, `gr`, `gi`, etc.) follow Neovim convention and live outside `<leader>`.
 - Plugin-internal keymaps (e.g. diffview buffer navigation) keep their defaults since they are context-local and don't pollute the global namespace.
-- Insert-mode and operator keys (`<C-s>`, `<C-y>*`, `[`/`]`) are unchanged.
+- Insert-mode and operator keys (`<C-s>`, `[`/`]`) are unchanged.
 
 ---
 
@@ -222,18 +222,7 @@ All git tooling lives under `<leader>g`, grouped by sub-namespace.
 
 ---
 
-## Emmet (insert mode, `<C-y>` prefix)
+## Emmet
 
-| Key | Action |
-|-----|--------|
-| `<C-y>y` | Expand abbreviation |
-| `<C-y>;` | Expand word |
-| `<C-y>d` / `D` | Balance tag inward / outward |
-| `<C-y>n` / `N` | Move to next / previous edit point |
-| `<C-y>j` | Split/join tag |
-| `<C-y>k` | Remove tag |
-| `<C-y>/` | Toggle comment |
-| `<C-y>a` / `A` | Anchorize URL / summary |
-| `<C-y>m` | Merge lines |
-| `<C-y>c` | Pretty code |
-| `<C-y>i` / `I` | Update / encode image |
+Emmet now runs through LSP completions (`emmet-language-server`) in the cmp menu.
+Type abbreviations like `script:module` and confirm with `<CR>` or `<Tab>`.

@@ -113,9 +113,21 @@ return {
         },
       },
     })
+
+    -- Configure emmet-language-server
+    vim.lsp.config('emmet_language_server', {
+      cmd = { 'emmet-language-server', '--stdio' },
+      filetypes = {
+        'html', 'css', 'scss', 'less',
+        'javascript', 'javascriptreact',
+        'typescript', 'typescriptreact',
+      },
+      root_markers = { '.git', 'package.json' },
+    })
     
     -- Enable ts_ls
     vim.lsp.enable('ts_ls')
+    vim.lsp.enable('emmet_language_server')
   end,
 }
 
