@@ -55,27 +55,31 @@ zero gain.
 
 ## Acceptance criteria
 
-- [ ] `mini.nvim` (or `mini.test` only — decided during Stage 2) is added as
+- [x] `mini.nvim` (or `mini.test` only — decided during Stage 2) is added as
       a `lazy.nvim` plugin spec at `lua/plugins/mini-test.lua`. Neovim
       startup remains clean: `nvim --headless +qa` exits 0.
-- [ ] `tests/` directory exists at the repo root.
-- [ ] `tests/minimal_init.lua` exists and is the headless bootstrap — it
-      prepends the repo root to `runtimepath`, requires `mini.test`, and
-      does nothing else. It does NOT load `init.lua` or any plugin from the
-      lazy plugin set; the test environment is deliberately minimal.
-- [ ] `scripts/test.sh` is executable (`chmod +x`) and runs every
-      `*_spec.lua` file under `tests/` via `mini.test`'s collection
-      mechanism, exiting with `nvim`'s exit code.
-- [ ] `Makefile` exists at the repo root with a single `test` target that
-      execs `scripts/test.sh`. `make test` is equivalent to running the
-      script directly.
-- [ ] One tracer-bullet spec at `tests/tracer_spec.lua` asserts a trivial
-      truth (`MiniTest.expect.equality(1, 1)` or equivalent) and passes.
-- [ ] `make test` exits 0 with the tracer in place.
-- [ ] Temporarily breaking the tracer's assertion makes `make test` exit
-      non-zero. Reverted before commit. Verified manually during Stage 2.
-- [ ] Output on green is no more than ~5 lines. Output on red shows the
-      failing assertion clearly.
+- [x] `tests/` directory exists at the repo root.
+- [x] ~~`tests/minimal_init.lua`~~ Bootstrap exists — implemented as
+      `tests/init.lua`. Prepends repo root to runtimepath and loads
+      `mini.test` without touching the main `init.lua` or lazy plugin set.
+      Also handles zero-spec short-circuit and explicit `find_files`.
+      (See AAR for deviation rationale.)
+- [x] ~~`scripts/test.sh`~~ Executable entry point exists — implemented as
+      `tests/run` (`chmod +x`). Runs every `*_spec.lua` under `tests/` via
+      `mini.test`'s collection, exits with `nvim`'s exit code.
+      (See AAR for deviation rationale.)
+- [ ] `Makefile` exists at the repo root with a single `test` target.
+      **Not done.** Execution brief chose Alternative A (script only).
+      (See AAR.)
+- [x] ~~`tests/tracer_spec.lua`~~ Real spec delivered immediately as
+      `tests/utils/wordcount_spec.lua` (6 cases, `utils.wordcount` public
+      API). Tracer skipped — execution brief directed a real spec from the
+      start.
+- [x] ~~`make test`~~ `./tests/run` exits 0 with specs in place.
+- [x] Temporarily breaking an assertion makes `./tests/run` exit non-zero.
+      Reverted before commit. Verified manually.
+- [x] Output on green is quiet (summary + pass dots). Output on red shows
+      the failing assertion, file, and line clearly.
 
 ## Proposed tests
 
@@ -93,16 +97,14 @@ permanent spec.
 ## Affected artifacts
 
 - New: `lua/plugins/mini-test.lua`
-- New: `tests/minimal_init.lua`
-- New: `tests/tracer_spec.lua`
-- New: `scripts/test.sh`
-- New: `Makefile`
+- New: `tests/init.lua` _(planned as `tests/minimal_init.lua`)_
+- New: `tests/utils/wordcount_spec.lua` _(planned as `tests/tracer_spec.lua`)_
+- New: `tests/run` _(planned as `scripts/test.sh`)_
+- ~~New: `Makefile`~~ — not created; Alternative A chosen during execution.
 - Modified: `lua/config/plugins.lua` — add the `mini-test` require.
 - Modified: `lazy-lock.json` — generated when `mini.nvim` is installed.
-
-The README pointer is **not** added in this sub-issue. It belongs in
-sub-issue 2 alongside the real example spec, so that the pointer points at
-something a future maintainer would actually want to read.
+- Modified: `README.md` — one-line Testing section added.
+  _(planned for sub-issue 2; moved earlier by the execution brief)_
 
 ## Dependencies
 

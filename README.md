@@ -169,6 +169,10 @@ All keymaps follow a **mnemonic namespace strategy**: every `<leader>` key seque
 - **Tmux**: For tmux integration (optional)
 - **macOS/Linux**: For automatic theme detection
 
+## Testing
+
+Run the test suite with `tests/run` (requires plugins installed via lazy.nvim first).
+
 ## Contributing
 
 This is a personal configuration, but suggestions and improvements are welcome!

@@ -44,5 +44,8 @@ table.insert(plugins, require("plugins.lualine"))
 -- Writing and note taking plugins
 table.insert(plugins, require("plugins.obsidian"))
 
+-- Testing
+table.insert(plugins, require("plugins.mini-test"))
+
 return plugins
 
