@@ -27,19 +27,20 @@ contract (acceptance criteria, implementation approach, flags).
       at least one passing unit test under `tests/utils/obsidian_cli/`,
       exercised by `./tests/run`. The test directory layout mirrors
       `lua/`.
-- [ ] At least one parser has a mutation test: temporarily breaking
+- [x] At least one parser has a mutation test: temporarily breaking
       the parser causes its spec to fail; reverting causes it to
-      pass. Recorded in the closing sub-issue's AAR.
-- [ ] At least one command-builder spec covers a subcommand whose
+      pass. Recorded in the closing sub-issue's AAR. *(#15
+      `15-search-context-builder-parser/aar.md`.)*
+- [x] At least one command-builder spec covers a subcommand whose
       arguments require shell-escaping — `search:context query=...` is
-      the canonical case.
-- [ ] `./tests/run` exits 0 on the whole suite — including
+      the canonical case. *(`tests/utils/obsidian_cli/command_spec.lua`.)*
+- [x] `./tests/run` exits 0 on the whole suite — including
       `tests/utils/wordcount_spec.lua` from cycle 01.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
       test suite runs to green with `obsidian` absent from `$PATH`).
 - [ ] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is
       empty.
-- [ ] No reaching into local functions or monkey-patching internals
+- [x] No reaching into local functions or monkey-patching internals
       anywhere in the new specs. Carry-forward acceptance criterion
       from cycle 01, still binding.
 - [ ] Decision on ADR-0003 (the four-layer-pattern ADR) recorded —
