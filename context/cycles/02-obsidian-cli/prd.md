@@ -269,6 +269,47 @@ avoid collision with the test-runner concept already established in cycle
   the module name (`obsidian_cli`). Rejected as awkward.
 - "Executor" — too generic, no role signal. Rejected.
 
+## Flags
+
+- [ ] [#13 AAR → future cycle: presenter testability]
+
+  `presenter.lua` has no unit tests. Whether the layer can be tested as a pure
+  transformation `(parsed_items) → quickfix_payload` or requires
+  `mini.test.new_child_neovim` for editor-state isolation was not assessed in
+  this cycle. PRD non-goal #4 anticipated this flag. A future presenter-focused
+  slice must make this call and either land pure tests or record the child-Neovim
+  decision in a sub-issue.
+
+  Files to review:
+  - `lua/utils/obsidian_cli/presenter.lua`
+  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/aar.md`
+
+- [ ] [#13 AAR → future cycle: backlinks integration-path coverage]
+
+  `M.backlinks_counts_to_quickfix` in `init.lua` has two distinct user-facing
+  messages ("Could not parse backlinks JSON…" vs "No backlinks parsed from
+  JSON…") that are not covered by any test. Coverage requires the shell-adapter
+  seam plus quickfix or scratch-buffer state assertions, or a child-Neovim spec.
+  (The pure-parser sub-requirement is closed by #19; only the integration-path
+  remains open.)
+
+  Files to review:
+  - `lua/utils/obsidian_cli/init.lua` (`M.backlinks_counts_to_quickfix`)
+  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/19-backlinks-json-builder-parser/aar.md`
+
+- [ ] [#13 AAR → future cycle: vault_relpath_to_abs consolidation]
+
+  `vault_relpath_to_abs` is duplicated as a local function in both `init.lua`
+  (line 33) and `parsers.lua` (lines 7–29). Extracting it into a fifth sibling
+  (`vault.lua` or similar) would eliminate duplication and make the resolver
+  seam (`parsers.set_resolver`) reusable for `init.lua`'s bookmark-keymap
+  callsite. Deepening candidate for a future pitch.
+
+  Files to review:
+  - `lua/utils/obsidian_cli/init.lua` (line 33, `vault_relpath_to_abs`)
+  - `lua/utils/obsidian_cli/parsers.lua` (lines 7–29, `vault_relpath_to_abs`)
+  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/20-bookmark-parser-resolver-seam/aar.md`
+
 ## Domain validation pass
 
 Walking the PRD for terms a domain expert (a user of this Neovim

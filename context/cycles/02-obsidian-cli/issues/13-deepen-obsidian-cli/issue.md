@@ -8,18 +8,18 @@ contract (acceptance criteria, implementation approach, flags).
 
 ## Acceptance criteria
 
-- [ ] `lua/utils/obsidian_cli/init.lua` exists and exports the same 14
+- [x] `lua/utils/obsidian_cli/init.lua` exists and exports the same 14
       `M.*` functions that the pre-cycle `lua/utils/obsidian_cli.lua`
       exposed, with the same names and the same argument shapes.
       Verified by `git diff` against the cycle base showing
       preserved-export parity, and by `lua/config/commands.lua`
       loading without edits.
-- [ ] The four sibling modules `command.lua`, `shell.lua`,
+- [x] The four sibling modules `command.lua`, `shell.lua`,
       `parsers.lua`, `presenter.lua` exist under
       `lua/utils/obsidian_cli/` and are independently `require`-able.
-- [ ] `grep -rn 'systemlist\|os\.execute\|io\.popen' lua/utils/obsidian_cli/`
+- [x] `grep -rn 'systemlist\|os\.execute\|io\.popen' lua/utils/obsidian_cli/`
       returns exactly one match, located inside `shell.lua`.
-- [ ] `shell.lua` exposes `set_runner(fn)` and `reset_runner()`. The
+- [x] `shell.lua` exposes `set_runner(fn)` and `reset_runner()`. The
       default runner wraps `vim.fn.systemlist` and is in effect on
       module load. No `M.*` function on `init.lua` accepts a runner
       parameter.
@@ -41,15 +41,15 @@ contract (acceptance criteria, implementation approach, flags).
       `tests/utils/wordcount_spec.lua` from cycle 01.
 - [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
       test suite runs to green with `obsidian` absent from `$PATH`).
-- [ ] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is
+- [x] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is
       empty.
 - [x] No reaching into local functions or monkey-patching internals
       anywhere in the new specs. Carry-forward acceptance criterion
       from cycle 01, still binding.
-- [ ] Decision on ADR-0003 (the four-layer-pattern ADR) recorded —
-      either authored at `context/adr/0003-<slug>.md` with INDEX
-      updated, or explicitly deferred-with-reason in this issue's
-      closing AAR.
+- [x] Decision on ADR-0003 (the four-layer-pattern ADR) recorded —
+      authored at `context/adr/0003-four-layer-subpackage-for-shell-bound-utilities.md`
+      with INDEX updated. *(Closed at parent issue closure; pattern held
+      intact across all 7 sub-issues.)*
 
 ## Implementation approach
 
