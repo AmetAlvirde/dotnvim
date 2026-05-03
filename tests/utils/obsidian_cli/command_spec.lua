@@ -27,4 +27,12 @@ T["command.search_context accepts empty string"] = function()
   expect_search_context(command.search_context(""), "")
 end
 
+T["command.orphans returns the static obsidian orphans string"] = function()
+  MiniTest.expect.equality(command.orphans(), "obsidian orphans")
+end
+
+T["command.deadends returns the static obsidian deadends string"] = function()
+  MiniTest.expect.equality(command.deadends(), "obsidian deadends")
+end
+
 return T

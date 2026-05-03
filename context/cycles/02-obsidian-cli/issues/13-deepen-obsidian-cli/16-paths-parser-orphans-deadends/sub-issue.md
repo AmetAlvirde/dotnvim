@@ -1,7 +1,6 @@
 # Sub-issue — paths parser (orphans + deadends)
 
-GitHub issue: #16 (provisional — confirm at activation, rename folder per
-ADR-0002 if the assigned number differs). Third sub-issue of parent #13. The
+GitHub issue: #16 (confirmed). Third sub-issue of parent #13. The
 second parser-pass slice after the #15 `search:context` slice. Lands the unit
 test for `parsers.paths` (the only parser shared between two leaves —
 `orphans_to_quickfix` and `deadends_to_quickfix`) and the two trivial
@@ -121,34 +120,36 @@ green. Optional, not committed.
 
 ## Acceptance criteria
 
-- [ ] `tests/utils/obsidian_cli/command_spec.lua` is extended with two
+**Closed** — see `aar.md`.
+
+- [x] `tests/utils/obsidian_cli/command_spec.lua` is extended with two
       cases asserting `command.orphans()` and `command.deadends()` return
       their exact static command strings. The existing five
       `search_context` cases remain unchanged and green.
-- [ ] `tests/utils/obsidian_cli/parsers_spec.lua` is extended with at
+- [x] `tests/utils/obsidian_cli/parsers_spec.lua` is extended with at
       least six new cases for `parsers.paths` covering: single path,
       multiple paths, empty-line skip, `total`-trailer skip,
       whitespace-trim, and a multi-shape fixture-driven mixed input. The
       existing `search_context` cases remain unchanged and green.
-- [ ] `tests/utils/obsidian_cli/fixtures/paths.txt` exists, contains a
+- [x] `tests/utils/obsidian_cli/fixtures/paths.txt` exists, contains a
       hand-curated mixed-shape sample (valid paths + blanks + `total`
       trailer + whitespace-padded path), and is read by the mixed-input
       `parsers.paths` spec at runtime.
-- [ ] `./tests/run` exits 0 on the whole suite — the new cases plus the
+- [x] `./tests/run` exits 0 on the whole suite — the new cases plus the
       #14 tracer plus #15's `search_context` cases plus cycle 01's
       `wordcount_spec.lua`.
-- [ ] `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` exits 0. No shell
+- [x] `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` exits 0. No shell
       call to `obsidian` happens during the new specs. (Carry-forward from
       #14 / #15 — the equivalent `PATH=/usr/bin:/bin` form fails because
       `nvim` lives in `/opt/homebrew/bin`; the spirit of the parent
       criterion is "obsidian absent from `$PATH`," which this form
       satisfies.)
-- [ ] No reaching into local functions or monkey-patching globals in the
+- [x] No reaching into local functions or monkey-patching globals in the
       new cases. `parsers.paths` and the two command builders are
       exercised through their public module surface only.
-- [ ] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is empty
+- [x] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is empty
       (carry-forward from parent — this slice does not edit the consumer).
-- [ ] `git diff <cycle-base>..HEAD -- lua/utils/obsidian_cli/` shows no
+- [x] `git diff <cycle-base>..HEAD -- lua/utils/obsidian_cli/` shows no
       changes other than fixes-with-test (if any). Speculative parser or
       builder changes are out of scope.
 

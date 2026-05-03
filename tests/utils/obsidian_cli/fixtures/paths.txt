@@ -1,0 +1,6 @@
+notes/alpha.md
+notes/beta.md
+  notes/spaced.md  
+
+   
+total
