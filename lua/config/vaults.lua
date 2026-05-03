@@ -3,7 +3,7 @@ local M = {}
 -- Single source of truth for Obsidian vault/workspace definitions.
 -- Consumers:
 -- - lua/plugins/obsidian.lua (obsidian.nvim workspaces)
--- - lua/utils/obsidian_cli.lua (vault root resolution)
+-- - lua/utils/obsidian_cli/ (vault root resolution)
 -- - lua/config/keymaps.lua (workspace switching)
 
 M.vaults = {

@@ -33,7 +33,7 @@
 | vault                 | An Obsidian-managed directory tree of Markdown notes; the unit of data this configuration's Obsidian-aware utilities operate over.                                               | "Obsidian directory", "notes folder"                                              |
 | vault root            | An absolute filesystem path registered in `lua/config/vaults.lua` that anchors a vault. Used to convert absolute file paths to vault-relative paths.                             | "vault path" (ambiguous with vault-relative path), "vault directory"              |
 | vault-relative path   | A note path expressed relative to a vault root, e.g. `inbox/note.md`. The form the Obsidian CLI accepts for `path=` arguments.                                                   | "relative path" (too generic), "rel path", "vault path"                           |
-| Obsidian CLI          | The external command-line tool (`obsidian` binary) that exposes Obsidian operations — tasks, backlinks, search, history, outline, bookmarks — as subcommands consumed by `lua/utils/obsidian_cli.lua`. | "obsidian-cli" (hyphenated form not used in this repo), "obscli" (internal variable name only) |
+| Obsidian CLI          | The external command-line tool (`obsidian` binary) that exposes Obsidian operations — tasks, backlinks, search, history, outline, bookmarks — as subcommands consumed by `lua/utils/obsidian_cli/`. | "obsidian-cli" (hyphenated form not used in this repo), "obscli" (internal variable name only) |
 
 ## Relationships
 

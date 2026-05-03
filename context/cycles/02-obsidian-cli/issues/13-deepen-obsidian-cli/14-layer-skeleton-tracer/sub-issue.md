@@ -138,35 +138,38 @@ not inside any layer.
 
 ## Acceptance criteria
 
-- [ ] Directory `lua/utils/obsidian_cli/` exists with files
+- [x] Directory `lua/utils/obsidian_cli/` exists with files
       `init.lua`, `command.lua`, `shell.lua`, `parsers.lua`,
       `presenter.lua`. The pre-cycle `lua/utils/obsidian_cli.lua` is
       deleted (so `require("utils.obsidian_cli")` resolves to
       `init.lua`).
-- [ ] `init.lua` exports the same 14 `M.*` function names that
+- [x] `init.lua` exports the same 14 `M.*` function names that
       `lua/utils/obsidian_cli.lua` exported, with the same argument
       shapes. Verified by the tracer spec.
-- [ ] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is
+- [x] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is
       empty.
-- [ ] `grep -rn 'systemlist\|os\.execute\|io\.popen' lua/utils/obsidian_cli/`
+- [x] `grep -rn 'systemlist\|os\.execute\|io\.popen' lua/utils/obsidian_cli/`
       returns exactly one match — inside `shell.lua`.
-- [ ] `shell.lua` exposes `set_runner(fn)` and `reset_runner()`. The
+- [x] `shell.lua` exposes `set_runner(fn)` and `reset_runner()`. The
       default runner wraps `vim.fn.systemlist` and is in effect on
       module load.
-- [ ] `parsers.lua` and `command.lua` contain zero references to
+- [x] `parsers.lua` and `command.lua` contain zero references to
       `vim.fn.systemlist`, `os.execute`, `io.popen`, or any
       shell-execution primitive. Verified by grep.
-- [ ] `command.lua` exposes one builder per non-trivial subcommand
+- [x] `command.lua` exposes one builder per non-trivial subcommand
       that a future sub-issue will write a builder test for —
       including the shell-escape case (`search:context`).
-- [ ] The tracer spec at `tests/utils/obsidian_cli/init_spec.lua`
+- [x] The tracer spec at `tests/utils/obsidian_cli/init_spec.lua`
       passes under `./tests/run`, asserting all 14 `M.*` names exist
       and are of `type == "function"`.
-- [ ] `./tests/run` exits 0 on the whole suite — this sub-issue's
+- [x] `./tests/run` exits 0 on the whole suite — this sub-issue's
       tracer plus cycle 01's `tests/utils/wordcount_spec.lua`.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0. No shell call to
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0. No shell call to
       `obsidian` happens at module load or during the tracer.
-- [ ] No reaching into local functions or monkey-patching globals in
+      (Verified as `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` —
+      nvim lives in `/opt/homebrew/bin`; `obsidian` is in an app-bundle
+      path outside any standard PATH. See AAR.)
+- [x] No reaching into local functions or monkey-patching globals in
       the tracer spec. Carry-forward acceptance criterion from cycle
       01.
 

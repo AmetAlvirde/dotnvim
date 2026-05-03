@@ -148,6 +148,32 @@ that maps to:
 
 ## Flags
 
-None at issue creation. This section is populated as sub-issues close
-and surface cross-sibling signals (per the cycle 01 issue.md
-precedent).
+- [ ] [#14 AAR → backlinks-parser sub-issue (#15+)]
+
+  `parsers.backlinks_json` returns `nil` for JSON-parse-failure and `{}` for
+  parse-success-but-no-rows. The sub-issue writing backlinks parser tests must
+  exercise both inputs separately: a non-JSON or unparseable string should
+  yield `nil`; a valid JSON document with no backlink data should yield `{}`.
+  The two distinct user-facing messages ("Could not parse..." vs "No backlinks
+  parsed...") live in `init.lua`'s branch logic and require integration-path
+  coverage (via the shell seam), not pure-parser coverage.
+
+  Files to review:
+  - `lua/utils/obsidian_cli/parsers.lua` (`M.backlinks_json`)
+  - `lua/utils/obsidian_cli/init.lua` (`M.backlinks_counts_to_quickfix`)
+  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/14-layer-skeleton-tracer/aar.md`
+
+- [ ] [#14 AAR → bookmark-parser sub-issue (#15+)]
+
+  `parsers.extract_bookmark_note_path` calls `vault_relpath_to_abs` internally,
+  which calls `vim.loop.fs_stat` and `vim.loop.fs_realpath`. The function is not
+  a pure transformation — its behavior depends on whether candidate paths exist
+  on disk. Unit tests for this parser will need either a child-Neovim fixture with
+  real vault files, or a test vault directory on disk. Pre-document the testing
+  strategy before activating that sub-issue; pure-module `require` testing will
+  not suffice here.
+
+  Files to review:
+  - `lua/utils/obsidian_cli/parsers.lua` (`M.extract_bookmark_note_path`,
+    private `vault_relpath_to_abs`)
+  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/14-layer-skeleton-tracer/aar.md`
