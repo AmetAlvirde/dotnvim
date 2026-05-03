@@ -55,4 +55,21 @@ T["command.unresolved returns the static obsidian unresolved verbose string"] = 
   MiniTest.expect.equality(command.unresolved(), "obsidian unresolved verbose")
 end
 
+local function expect_backlinks_counts(cmd, rel)
+  local expected = "obsidian backlinks path=" .. vim.fn.shellescape(rel) .. " counts format=json"
+  MiniTest.expect.equality(cmd, expected)
+end
+
+T["command.backlinks_counts shell-escapes a plain vault-relative path"] = function()
+  expect_backlinks_counts(command.backlinks_counts("notes/topic.md"), "notes/topic.md")
+end
+
+T["command.backlinks_counts shell-escapes a path with whitespace"] = function()
+  expect_backlinks_counts(command.backlinks_counts("folder with spaces/note.md"), "folder with spaces/note.md")
+end
+
+T["command.backlinks_counts shell-escapes a path with single quotes"] = function()
+  expect_backlinks_counts(command.backlinks_counts("it's complicated.md"), "it's complicated.md")
+end
+
 return T

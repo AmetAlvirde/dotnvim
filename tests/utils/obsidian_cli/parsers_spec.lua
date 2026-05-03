@@ -315,4 +315,155 @@ T["parsers.unresolved_verbose parses mixed-shape fixture"] = function()
   )
 end
 
+-- backlinks_json: flag-required cases (parent flag, load-bearing)
+
+T["parsers.backlinks_json returns nil on non-JSON input (parse-failure branch)"] = function()
+  MiniTest.expect.equality(parsers.backlinks_json("not json at all"), nil)
+end
+
+T["parsers.backlinks_json returns empty table on empty array [] (parse-success-but-no-rows branch)"] = function()
+  local result = parsers.backlinks_json("[]")
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 0)
+end
+
+T["parsers.backlinks_json returns empty table on empty object {} (parse-success-but-no-rows branch)"] = function()
+  local result = parsers.backlinks_json("{}")
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 0)
+end
+
+T['parsers.backlinks_json returns empty table on {"backlinks": []} (parse-success-but-no-rows branch)'] = function()
+  local result = parsers.backlinks_json('{"backlinks": []}')
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 0)
+end
+
+-- backlinks_json: schema-tolerant matrix
+
+T["parsers.backlinks_json returns nil on empty input"] = function()
+  MiniTest.expect.equality(parsers.backlinks_json(""), nil)
+end
+
+T["parsers.backlinks_json returns nil on whitespace-only input"] = function()
+  MiniTest.expect.equality(parsers.backlinks_json("   "), nil)
+end
+
+T["parsers.backlinks_json returns nil on nil input"] = function()
+  MiniTest.expect.equality(parsers.backlinks_json(nil), nil)
+end
+
+T["parsers.backlinks_json succeeds via substring retry when JSON is preceded by noise"] = function()
+  local result = parsers.backlinks_json('warning: stale cache\n{"a.md": 3}')
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "a.md", count = 3 })
+end
+
+T["parsers.backlinks_json returns nil when both decode and substring retry fail"] = function()
+  MiniTest.expect.equality(parsers.backlinks_json("noise {bad json"), nil)
+end
+
+T["parsers.backlinks_json parses a top-level list of strings as paths with count = 1"] = function()
+  local result = parsers.backlinks_json('["notes/a.md", "notes/b.md"]')
+  MiniTest.expect.equality(#result, 2)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 1 })
+  MiniTest.expect.equality(result[2], { path = "notes/b.md", count = 1 })
+end
+
+T["parsers.backlinks_json parses a top-level list of objects with path and count"] = function()
+  local result = parsers.backlinks_json('[{"path": "notes/a.md", "count": 4}, {"path": "notes/b.md", "count": 2}]')
+  MiniTest.expect.equality(#result, 2)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 4 })
+  MiniTest.expect.equality(result[2], { path = "notes/b.md", count = 2 })
+end
+
+T["parsers.backlinks_json accepts field aliases for path and count"] = function()
+  local result = parsers.backlinks_json('[{"file": "notes/a.md", "linkCount": 7}]')
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 7 })
+end
+
+T["parsers.backlinks_json falls back to count = 1 when count is missing"] = function()
+  local result = parsers.backlinks_json('[{"path": "notes/a.md"}]')
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 1 })
+end
+
+T["parsers.backlinks_json clamps zero count to 1 without dropping the row"] = function()
+  local result = parsers.backlinks_json('[{"path": "notes/a.md", "count": 0}]')
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 1 })
+end
+
+T["parsers.backlinks_json clamps negative count to 1 without dropping the row"] = function()
+  local result = parsers.backlinks_json('[{"path": "notes/a.md", "count": -3}]')
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 1 })
+end
+
+T["parsers.backlinks_json drops rows with empty path"] = function()
+  local result = parsers.backlinks_json('[{"path": "", "count": 5}, {"path": "notes/a.md", "count": 2}]')
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 2 })
+end
+
+T["parsers.backlinks_json drops rows with whitespace-only path"] = function()
+  local result = parsers.backlinks_json('[{"path": "   ", "count": 5}]')
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 0)
+end
+
+T["parsers.backlinks_json parses object-key shape (.md keys with numeric values)"] = function()
+  local result = parsers.backlinks_json('{"notes/a.md": 3, "notes/b.md": 1}')
+  MiniTest.expect.equality(#result, 2)
+  table.sort(result, function(a, b) return a.path < b.path end)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 3 })
+  MiniTest.expect.equality(result[2], { path = "notes/b.md", count = 1 })
+end
+
+T["parsers.backlinks_json parses nested-list shape under backlinks key"] = function()
+  local result = parsers.backlinks_json('{"backlinks": [{"path": "notes/a.md", "count": 2}]}')
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 2 })
+end
+
+T["parsers.backlinks_json parses nested-list shape under items key"] = function()
+  local result = parsers.backlinks_json('{"items": [{"path": "notes/a.md", "count": 5}]}')
+  MiniTest.expect.equality(#result, 1)
+  MiniTest.expect.equality(result[1], { path = "notes/a.md", count = 5 })
+end
+
+T["parsers.backlinks_json returns empty table for top-level scalar JSON (number)"] = function()
+  local result = parsers.backlinks_json("42")
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 0)
+end
+
+T["parsers.backlinks_json returns empty table for top-level scalar JSON (string)"] = function()
+  local result = parsers.backlinks_json('"hello"')
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 0)
+end
+
+T["parsers.backlinks_json returns empty table for top-level scalar JSON (boolean)"] = function()
+  local result = parsers.backlinks_json("true")
+  MiniTest.expect.equality(type(result), "table")
+  MiniTest.expect.equality(#result, 0)
+end
+
+T["parsers.backlinks_json parses mixed-shape fixture end-to-end"] = function()
+  local spec_dir = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h")
+  local path = spec_dir .. "/fixtures/backlinks_json.txt"
+  local f = assert(io.open(path, "r"))
+  local text = f:read("*a")
+  f:close()
+
+  local result = parsers.backlinks_json(text)
+  MiniTest.expect.equality(#result, 3)
+  MiniTest.expect.equality(result[1], { path = "notes/alpha.md", count = 3 })
+  MiniTest.expect.equality(result[2], { path = "notes/beta.md", count = 7 })
+  MiniTest.expect.equality(result[3], { path = "notes/gamma.md", count = 1 })
+end
+
 return T

@@ -26,9 +26,9 @@ contract (acceptance criteria, implementation approach, flags).
 - [ ] Every output parser introduced or extracted by the deepening has
   at least one passing unit test under `tests/utils/obsidian_cli/`,
   exercised by `./tests/run`. The test directory layout mirrors
-  `lua/`. *(Progress as of #18: 4 of 6 parsers have dedicated specs —
+  `lua/`. *(Progress as of #19: 5 of 6 parsers have dedicated specs —
   `search_context` [#15], `paths` [#16], `tasks_verbose` [#17],
-  `unresolved_verbose` [#18]. Remaining: `backlinks_json`,
+  `unresolved_verbose` [#18], `backlinks_json` [#19]. Remaining:
   `extract_bookmark_note_path`.)*
 - [x] At least one parser has a mutation test: temporarily breaking
       the parser causes its spec to fail; reverting causes it to
@@ -152,20 +152,22 @@ that maps to:
 
 ## Flags
 
-- [ ] [#14 AAR → backlinks-parser sub-issue (#15+)]
+- [ ] [#14 AAR → backlinks-parser sub-issue (#15+)] *(partially resolved by #19)*
 
-  `parsers.backlinks_json` returns `nil` for JSON-parse-failure and `{}` for
-  parse-success-but-no-rows. The sub-issue writing backlinks parser tests must
-  exercise both inputs separately: a non-JSON or unparseable string should
-  yield `nil`; a valid JSON document with no backlink data should yield `{}`.
-  The two distinct user-facing messages ("Could not parse..." vs "No backlinks
-  parsed...") live in `init.lua`'s branch logic and require integration-path
-  coverage (via the shell seam), not pure-parser coverage.
+  **Pure-parser sub-requirement — closed by #19.** `parsers.backlinks_json`
+  returns `nil` on JSON-parse-failure and `{}` on parse-success-but-no-rows.
+  Both branches are now exercised by dedicated named cases in
+  `tests/utils/obsidian_cli/parsers_spec.lua`. See `19-…/aar.md`.
+
+  **Integration-path sub-requirement — still open.** The two distinct
+  user-facing messages in `init.lua` ("Could not parse backlinks JSON…" vs
+  "No backlinks parsed from JSON…") require the shell-adapter seam plus
+  quickfix / scratch-buffer state assertions, or a child-Neovim spec.
+  Deferred to a future presenter / shell-seam slice.
 
   Files to review:
-  - `lua/utils/obsidian_cli/parsers.lua` (`M.backlinks_json`)
   - `lua/utils/obsidian_cli/init.lua` (`M.backlinks_counts_to_quickfix`)
-  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/14-layer-skeleton-tracer/aar.md`
+  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/19-backlinks-json-builder-parser/aar.md`
 
 - [ ] [#14 AAR → bookmark-parser sub-issue (#15+)]
 
