@@ -35,4 +35,20 @@ T["command.deadends returns the static obsidian deadends string"] = function()
   MiniTest.expect.equality(command.deadends(), "obsidian deadends")
 end
 
+T["command.tasks defaults to obsidian tasks todo verbose"] = function()
+  MiniTest.expect.equality(command.tasks(), "obsidian tasks todo verbose")
+end
+
+T["command.tasks({}) matches the default"] = function()
+  MiniTest.expect.equality(command.tasks({}), "obsidian tasks todo verbose")
+end
+
+T["command.tasks({ only_todo = true }) returns obsidian tasks todo verbose"] = function()
+  MiniTest.expect.equality(command.tasks({ only_todo = true }), "obsidian tasks todo verbose")
+end
+
+T["command.tasks({ only_todo = false }) returns obsidian tasks verbose"] = function()
+  MiniTest.expect.equality(command.tasks({ only_todo = false }), "obsidian tasks verbose")
+end
+
 return T

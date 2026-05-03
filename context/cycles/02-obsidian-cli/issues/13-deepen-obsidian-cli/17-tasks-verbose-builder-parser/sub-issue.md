@@ -1,7 +1,8 @@
 # Sub-issue — tasks_verbose builder + parser (grouped-by-file)
 
-GitHub issue: #17 (to be confirmed at activation; folder slug is rewritten if
-the actual GitHub issue number differs — ADR-0002). Fourth sub-issue of parent
+**Status: closed** — see `17-tasks-verbose-builder-parser/aar.md`.
+
+GitHub issue: #17 (folder slug per ADR-0002). Fourth sub-issue of parent
 #13. The third parser-pass slice after #15 (`search_context`) and #16 (`paths`).
 Lands the unit tests for `parsers.tasks_verbose` (the grouped-by-file format
 produced by `obsidian tasks [todo] verbose`) and the non-trivial command-builder
@@ -180,37 +181,37 @@ Optional, not committed.
 
 ## Acceptance criteria
 
-- [ ] `tests/utils/obsidian_cli/command_spec.lua` is extended with four cases
+- [x] `tests/utils/obsidian_cli/command_spec.lua` is extended with four cases
       covering `command.tasks` defaults, empty-table opts, explicit
       `only_todo = true`, and explicit `only_todo = false`. The existing five
       `search_context` cases and two static-builder cases (`orphans`,
       `deadends`) remain unchanged and green.
-- [ ] `tests/utils/obsidian_cli/parsers_spec.lua` is extended with at least
+- [x] `tests/utils/obsidian_cli/parsers_spec.lua` is extended with at least
       eight new cases for `parsers.tasks_verbose` covering: grouped block
       (lnum-colon-text and lnum-space-text), multiple header sections, inline
       `path:line:text`, header-guard against `:digits` lines, header-guard
       against checkbox-shaped lines, `user_data.obsidian_task_ref` round-trip,
       empty-line skip, and a mixed-shape fixture-driven case. The existing
       `search_context` and `paths` cases remain unchanged and green.
-- [ ] `tests/utils/obsidian_cli/fixtures/tasks_verbose.txt` exists, contains a
+- [x] `tests/utils/obsidian_cli/fixtures/tasks_verbose.txt` exists, contains a
       hand-curated mixed-shape sample (two header sections of differing
       lnum-text shape + one interleaved inline `path:line:text` line + blanks +
       one header-shaped line carrying `:digits` suffix), and is read by the
       mixed-input `parsers.tasks_verbose` spec at runtime.
-- [ ] `./tests/run` exits 0 on the whole suite — the new cases plus everything
+- [x] `./tests/run` exits 0 on the whole suite — the new cases plus everything
       from #14, #15, #16, plus cycle 01's `wordcount_spec.lua`.
-- [ ] `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` exits 0. No shell call
+- [x] `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` exits 0. No shell call
       to `obsidian` happens during the new specs. (Carry-forward from #14 / #15
       / #16 — the equivalent `PATH=/usr/bin:/bin` form fails because `nvim`
       lives in `/opt/homebrew/bin`; the spirit of the parent criterion is
       "obsidian absent from `$PATH`," which this form satisfies.)
-- [ ] No reaching into local functions or monkey-patching globals in the new
+- [x] No reaching into local functions or monkey-patching globals in the new
       cases. `parsers.tasks_verbose` and `command.tasks` are exercised through
       their public module surface only. The private `parse_path_line_text`
       helper is exercised transitively, never directly.
-- [ ] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is empty
+- [x] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is empty
       (carry-forward from parent — this slice does not edit the consumer).
-- [ ] `git diff <cycle-base>..HEAD -- lua/utils/obsidian_cli/` shows no changes
+- [x] `git diff <cycle-base>..HEAD -- lua/utils/obsidian_cli/` shows no changes
       other than fixes-with-test (if any). Speculative parser or builder changes
       are out of scope.
 
@@ -250,11 +251,10 @@ Optional and unrecorded.
   `tests/utils/wordcount_spec.lua`.
 - Unchanged: closed sibling sub-issue folders (`14-...`, `15-...`, `16-...`) —
   this slice does not edit them.
-- Unchanged: parent `issue.md` (the slice closes no parent acceptance criteria
-  outright — see pre-activation review — and resolves no parent flag). The
-  parent's parser-coverage progress note will be updated by this slice's AAR
-  pointer rather than an in-text edit, matching how #15 → #16 advanced 1/6 →
-  2/6.
+- **Updated at closure:** parent `issue.md` parser progress line (3 of 6, lists
+  `tasks_verbose` [#17]) — per `sdp-close` outward pass for an active artifact;
+  the slice still closes no parent acceptance criterion outright and resolves
+  no parent flag.
 - New (closing artifact): `17-tasks-verbose-builder-parser/aar.md` — records any
   deviations from this plan and notes the parser-coverage count after this slice
   (3 of 6).
@@ -273,8 +273,8 @@ Optional and unrecorded.
   for static / non-shellescape builders; this slice extends the same file with
   the only branching builder.
 - **ADR-0001** — `mini.test` runner. Accepted.
-- **ADR-0002** — folder slug `17-...` tracks GitHub issue number. Confirm `#17`
-  at activation; rename folder if the actual issue gets a different number.
+- **ADR-0002** — folder slug `17-...` tracks GitHub issue number `#17`
+  (confirmed).
 - No dependency on any other parent or any other cycle.
 
 ## Out of scope (deferred to later #17+ slices)
@@ -334,14 +334,13 @@ empty, ADR-0003 decision) sit outside this slice's scope.
 
 ### Outward pass — parent issue updates after closure
 
-On closure, this slice's AAR records:
+**Done:** Parser progress in parent `issue.md` (lines 29–31) updated to
+`Progress as of #17: 3 of 6` with `tasks_verbose` [#17] listed.
 
-- Parser-coverage advance: `2/6 → 3/6`. The parent's open parser criterion
-  bullet (`issue.md` lines 26–31, "Progress as of #16: 2 of 6 parsers...") is
-  updated by the next slice that touches the parent's progress line, or in the
-  cycle-closing AAR — not in this slice. Recording the advance in the AAR is
-  sufficient outward pass for a partial-progress slice (matching the #16 →
-  parent posture).
+On closure, this slice's AAR also records:
+
+- Parser-coverage advance: `2/6 → 3/6` (redundant with parent text; AAR is the
+  audit trail).
 - Any deviations from the proposed test list, with rationale.
 - Any defects-fixed-with-test in `parsers.tasks_verbose` or `command.tasks`
   (none expected).

@@ -113,4 +113,105 @@ T["parsers.paths parses mixed-shape fixture"] = function()
   MiniTest.expect.equality(items[3], item("notes/spaced.md", 1, "notes/spaced.md"))
 end
 
+local function task_item(filename, lnum, text)
+  return {
+    filename = filename,
+    lnum = lnum,
+    col = 1,
+    text = text,
+    user_data = { obsidian_task_ref = filename .. ":" .. lnum },
+  }
+end
+
+T["parsers.tasks_verbose parses a grouped block (lnum-colon-text)"] = function()
+  local lines = {
+    "notes/work.md",
+    "  12: - [ ] Write the spec",
+    "  18: - [ ] Land the PR",
+  }
+  local items = parsers.tasks_verbose(lines)
+  MiniTest.expect.equality(#items, 2)
+  MiniTest.expect.equality(items[1], task_item("notes/work.md", 12, "- [ ] Write the spec"))
+  MiniTest.expect.equality(items[2], task_item("notes/work.md", 18, "- [ ] Land the PR"))
+end
+
+T["parsers.tasks_verbose parses a grouped block (lnum-space-text)"] = function()
+  local lines = {
+    "notes/work.md",
+    "  5 Morning checklist",
+  }
+  local items = parsers.tasks_verbose(lines)
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(items[1], task_item("notes/work.md", 5, "Morning checklist"))
+end
+
+T["parsers.tasks_verbose parses multiple header sections in sequence"] = function()
+  local lines = {
+    "notes/alpha.md",
+    "  3: task alpha one",
+    "notes/beta.md",
+    "  7: task beta one",
+    "  9: task beta two",
+  }
+  local items = parsers.tasks_verbose(lines)
+  MiniTest.expect.equality(#items, 3)
+  MiniTest.expect.equality(items[1], task_item("notes/alpha.md", 3, "task alpha one"))
+  MiniTest.expect.equality(items[2], task_item("notes/beta.md", 7, "task beta one"))
+  MiniTest.expect.equality(items[3], task_item("notes/beta.md", 9, "task beta two"))
+end
+
+T["parsers.tasks_verbose parses an inline path:line:text line outside any header"] = function()
+  local items = parsers.tasks_verbose({ "notes/standalone.md:7: inline task" })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(items[1], task_item("notes/standalone.md", 7, "inline task"))
+end
+
+T["parsers.tasks_verbose does not treat a path.md:N:... line as a header"] = function()
+  local items = parsers.tasks_verbose({ "notes/foo.md:42: x" })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(items[1].filename, "notes/foo.md")
+  MiniTest.expect.equality(items[1].lnum, 42)
+end
+
+T["parsers.tasks_verbose does not treat a checkbox-shaped line as a header"] = function()
+  local items = parsers.tasks_verbose({ "notes/foo.md - [ ] something" })
+  MiniTest.expect.equality(#items, 0)
+end
+
+T["parsers.tasks_verbose populates user_data.obsidian_task_ref"] = function()
+  local items1 = parsers.tasks_verbose({ "notes/a.md", "  3: task text" })
+  MiniTest.expect.equality(items1[1].user_data.obsidian_task_ref, "notes/a.md:3")
+  local items2 = parsers.tasks_verbose({ "notes/b.md:5: inline" })
+  MiniTest.expect.equality(items2[1].user_data.obsidian_task_ref, "notes/b.md:5")
+end
+
+T["parsers.tasks_verbose skips empty and whitespace-only lines without resetting current_file"] = function()
+  local lines = {
+    "notes/work.md",
+    "",
+    "   ",
+    "  4: still attached",
+  }
+  local items = parsers.tasks_verbose(lines)
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(items[1], task_item("notes/work.md", 4, "still attached"))
+end
+
+T["parsers.tasks_verbose parses a mixed-shape fixture"] = function()
+  local spec_dir = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h")
+  local path = spec_dir .. "/fixtures/tasks_verbose.txt"
+  local f = assert(io.open(path, "r"))
+  local body = f:read("*a")
+  f:close()
+  local lines = vim.split(body, "\n", { plain = true })
+  local items = parsers.tasks_verbose(lines)
+
+  MiniTest.expect.equality(#items, 5)
+  MiniTest.expect.equality(items[1], task_item("notes/work.md", 12, "- [ ] Write the spec"))
+  MiniTest.expect.equality(items[2], task_item("notes/work.md", 18, "- [ ] Land the PR"))
+  MiniTest.expect.equality(items[3], task_item("notes/journal.md", 5, "Morning checklist"))
+  MiniTest.expect.equality(items[4], task_item("notes/standalone.md", 7, "inline task"))
+  MiniTest.expect.equality(items[5], task_item("notes/fake.md", 42, "artifact"))
+end
+
 return T
