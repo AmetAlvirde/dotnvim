@@ -28,6 +28,20 @@ local function vault_relpath_to_abs(rel)
   return nil
 end
 
+local function default_resolver(rel)
+  return vault_relpath_to_abs(rel)
+end
+
+local current_resolver = default_resolver
+
+function M.set_resolver(fn)
+  current_resolver = fn
+end
+
+function M.reset_resolver()
+  current_resolver = default_resolver
+end
+
 local function parse_path_line_text(line)
   -- Supports:
   -- 1) `path/to/file.md:123: - [ ] ...`
@@ -271,7 +285,7 @@ function M.extract_bookmark_note_path(line)
   for _, cell in ipairs(cells) do
     cell = vim.trim(cell):gsub("^[\"'](.*)[\"']$", "%1")
     if cell ~= "" and not cell:match("^https?:") then
-      if vault_relpath_to_abs(cell) then
+      if current_resolver(cell) then
         return cell
       end
       if cell:match("%.md$") then

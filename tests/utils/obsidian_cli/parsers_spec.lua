@@ -466,4 +466,123 @@ T["parsers.backlinks_json parses mixed-shape fixture end-to-end"] = function()
   MiniTest.expect.equality(result[3], { path = "notes/gamma.md", count = 1 })
 end
 
+-- bookmark cases: two sub-sets so the resolver stub is installed/reset around each case
+
+local bm_no_res = MiniTest.new_set({
+  hooks = {
+    pre_case = function() parsers.set_resolver(function() return nil end) end,
+    post_case = function() parsers.reset_resolver() end,
+  },
+})
+T["bookmarks-no-resolver"] = bm_no_res
+
+local bm_with_res = MiniTest.new_set({
+  hooks = {
+    pre_case = function()
+      parsers.set_resolver(function(cell)
+        if cell == "notes/no-extension" then return true end
+      end)
+    end,
+    post_case = function() parsers.reset_resolver() end,
+  },
+})
+T["bookmarks-with-resolver"] = bm_with_res
+
+bm_no_res["parsers.extract_bookmark_note_path returns nil for nil input"] = function()
+  MiniTest.expect.equality(parsers.extract_bookmark_note_path(nil), nil)
+end
+
+bm_no_res["parsers.extract_bookmark_note_path returns nil for empty string input"] = function()
+  MiniTest.expect.equality(parsers.extract_bookmark_note_path(""), nil)
+end
+
+bm_no_res["parsers.extract_bookmark_note_path returns an unquoted .md cell verbatim"] = function()
+  MiniTest.expect.equality(parsers.extract_bookmark_note_path("notes/foo.md"), "notes/foo.md")
+end
+
+bm_no_res["parsers.extract_bookmark_note_path strips surrounding double quotes from a quoted .md cell"] = function()
+  MiniTest.expect.equality(parsers.extract_bookmark_note_path('"notes/foo.md"'), "notes/foo.md")
+end
+
+bm_no_res["parsers.extract_bookmark_note_path strips surrounding single quotes from a quoted .md cell"] = function()
+  MiniTest.expect.equality(parsers.extract_bookmark_note_path("'notes/foo.md'"), "notes/foo.md")
+end
+
+bm_no_res["parsers.extract_bookmark_note_path skips http:// cells and returns the next .md cell"] = function()
+  MiniTest.expect.equality(
+    parsers.extract_bookmark_note_path("http://example.com\tnotes/foo.md"),
+    "notes/foo.md"
+  )
+end
+
+bm_no_res["parsers.extract_bookmark_note_path skips https:// cells and returns the next .md cell"] = function()
+  MiniTest.expect.equality(
+    parsers.extract_bookmark_note_path("https://example.com\tnotes/foo.md"),
+    "notes/foo.md"
+  )
+end
+
+bm_no_res["parsers.extract_bookmark_note_path returns the first .md cell when title cell precedes path cell"] = function()
+  MiniTest.expect.equality(
+    parsers.extract_bookmark_note_path('"My Bookmark"\tnotes/topic.md'),
+    "notes/topic.md"
+  )
+end
+
+bm_no_res["parsers.extract_bookmark_note_path skips empty and whitespace-only cells"] = function()
+  MiniTest.expect.equality(
+    parsers.extract_bookmark_note_path("\t   \tnotes/foo.md"),
+    "notes/foo.md"
+  )
+end
+
+bm_with_res["parsers.extract_bookmark_note_path returns a non-.md cell when the resolver reports it as a real note"] = function()
+  MiniTest.expect.equality(
+    parsers.extract_bookmark_note_path("notes/no-extension"),
+    "notes/no-extension"
+  )
+end
+
+bm_no_res["parsers.extract_bookmark_note_path falls through when resolver returns nil and cell does not end in .md"] = function()
+  MiniTest.expect.equality(
+    parsers.extract_bookmark_note_path("notes/no-extension\tnotes/foo.md"),
+    "notes/foo.md"
+  )
+end
+
+bm_no_res["parsers.extract_bookmark_note_path extracts a .md path via the line-level fallback regex"] = function()
+  -- Cell "see notes/inline.md here" does not end in .md and resolver is nil,
+  -- so the per-cell loop yields nothing; the line-level regex captures "notes/inline"
+  -- and appends ".md".
+  MiniTest.expect.equality(
+    parsers.extract_bookmark_note_path("see notes/inline.md here"),
+    "notes/inline.md"
+  )
+end
+
+bm_no_res["parsers.extract_bookmark_note_path returns nil when neither cells nor fallback regex match"] = function()
+  MiniTest.expect.equality(parsers.extract_bookmark_note_path("plain text with no path"), nil)
+end
+
+bm_no_res["parsers.extract_bookmark_note_path parses a mixed-shape fixture line by line"] = function()
+  local spec_dir = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h")
+  local path = spec_dir .. "/fixtures/bookmarks_verbose.txt"
+  local f = assert(io.open(path, "r"))
+  local body = f:read("*a")
+  f:close()
+  local lines = vim.split(body, "\n", { plain = true })
+  local results = {}
+  for _, line in ipairs(lines) do
+    local p = parsers.extract_bookmark_note_path(line)
+    if p then
+      table.insert(results, p)
+    end
+  end
+  MiniTest.expect.equality(#results, 4)
+  MiniTest.expect.equality(results[1], "notes/linked.md")
+  MiniTest.expect.equality(results[2], "notes/topic.md")
+  MiniTest.expect.equality(results[3], "notes/simple.md")
+  MiniTest.expect.equality(results[4], "notes/quoted.md")
+end
+
 return T

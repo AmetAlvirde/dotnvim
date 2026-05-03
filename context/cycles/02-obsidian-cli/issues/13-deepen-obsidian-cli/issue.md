@@ -23,13 +23,13 @@ contract (acceptance criteria, implementation approach, flags).
       default runner wraps `vim.fn.systemlist` and is in effect on
       module load. No `M.*` function on `init.lua` accepts a runner
       parameter.
-- [ ] Every output parser introduced or extracted by the deepening has
+- [x] Every output parser introduced or extracted by the deepening has
   at least one passing unit test under `tests/utils/obsidian_cli/`,
   exercised by `./tests/run`. The test directory layout mirrors
-  `lua/`. *(Progress as of #19: 5 of 6 parsers have dedicated specs —
+  `lua/`. *(Progress as of #20: 6 of 6 parsers have dedicated specs —
   `search_context` [#15], `paths` [#16], `tasks_verbose` [#17],
-  `unresolved_verbose` [#18], `backlinks_json` [#19]. Remaining:
-  `extract_bookmark_note_path`.)*
+  `unresolved_verbose` [#18], `backlinks_json` [#19],
+  `extract_bookmark_note_path` [#20].)*
 - [x] At least one parser has a mutation test: temporarily breaking
       the parser causes its spec to fail; reverting causes it to
       pass. Recorded in the closing sub-issue's AAR. *(#15
@@ -169,17 +169,10 @@ that maps to:
   - `lua/utils/obsidian_cli/init.lua` (`M.backlinks_counts_to_quickfix`)
   - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/19-backlinks-json-builder-parser/aar.md`
 
-- [ ] [#14 AAR → bookmark-parser sub-issue (#15+)]
+- [x] [#14 AAR → bookmark-parser sub-issue (#15+)] **Resolved by #20.**
 
-  `parsers.extract_bookmark_note_path` calls `vault_relpath_to_abs` internally,
-  which calls `vim.loop.fs_stat` and `vim.loop.fs_realpath`. The function is not
-  a pure transformation — its behavior depends on whether candidate paths exist
-  on disk. Unit tests for this parser will need either a child-Neovim fixture with
-  real vault files, or a test vault directory on disk. Pre-document the testing
-  strategy before activating that sub-issue; pure-module `require` testing will
-  not suffice here.
-
-  Files to review:
-  - `lua/utils/obsidian_cli/parsers.lua` (`M.extract_bookmark_note_path`,
-    private `vault_relpath_to_abs`)
-  - `context/cycles/02-obsidian-cli/issues/13-deepen-obsidian-cli/14-layer-skeleton-tracer/aar.md`
+  Option B (DI resolver seam) was selected and documented in the sub-issue before
+  implementation. `parsers.set_resolver(fn)` / `parsers.reset_resolver()` added
+  to `parsers.lua`. Tests stub the resolver via `pre_case`/`post_case`; no disk
+  access in the new cases. 14 named specs cover all observable behaviors of
+  `extract_bookmark_note_path`. See `20-bookmark-parser-resolver-seam/aar.md`.
