@@ -214,4 +214,105 @@ T["parsers.tasks_verbose parses a mixed-shape fixture"] = function()
   MiniTest.expect.equality(items[5], task_item("notes/fake.md", 42, "artifact"))
 end
 
+T["parsers.unresolved_verbose parses a single-source TSV line"] = function()
+  local items = parsers.unresolved_verbose({ "some-link\t3\tnotes/source.md" })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(
+    items[1],
+    item("notes/source.md", 1, "some-link (count=3) sources: notes/source.md")
+  )
+end
+
+T["parsers.unresolved_verbose parses a comma-separated multi-source TSV line"] = function()
+  local items = parsers.unresolved_verbose({ "link\t2\tnotes/a.md, notes/b.md" })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(
+    items[1],
+    item("notes/a.md", 1, "link (count=2) sources: notes/a.md, notes/b.md")
+  )
+end
+
+T["parsers.unresolved_verbose parses multiple TSV lines in order"] = function()
+  local items = parsers.unresolved_verbose({
+    "a\t1\tx.md",
+    "b\t2\ty.md",
+  })
+  MiniTest.expect.equality(#items, 2)
+  MiniTest.expect.equality(items[1], item("x.md", 1, "a (count=1) sources: x.md"))
+  MiniTest.expect.equality(items[2], item("y.md", 1, "b (count=2) sources: y.md"))
+end
+
+T["parsers.unresolved_verbose falls back to empty-string filename on no-md-source"] = function()
+  local items = parsers.unresolved_verbose({ "orphan-link\t1\tunknown" })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(items[1].filename, "")
+  MiniTest.expect.equality(items[1].lnum, 1)
+  MiniTest.expect.equality(items[1].col, 1)
+  MiniTest.expect.equality(items[1].text, "orphan-link (count=1) sources: unknown")
+end
+
+T["parsers.unresolved_verbose skips lines with fewer than three tab parts"] = function()
+  MiniTest.expect.equality(#parsers.unresolved_verbose({ "only-one-cell" }), 0)
+  MiniTest.expect.equality(#parsers.unresolved_verbose({ "two\tcells" }), 0)
+  MiniTest.expect.equality(#parsers.unresolved_verbose({ "" }), 0)
+  MiniTest.expect.equality(#parsers.unresolved_verbose({ "   " }), 0)
+end
+
+T["parsers.unresolved_verbose skips empty and whitespace-only lines mixed with valid TSV"] = function()
+  MiniTest.expect.equality(#parsers.unresolved_verbose(nil), 0)
+  local items = parsers.unresolved_verbose({
+    "",
+    "   ",
+    "mid\t3\tnotes/keep.md",
+    "\t",
+  })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(
+    items[1],
+    item("notes/keep.md", 1, "mid (count=3) sources: notes/keep.md")
+  )
+end
+
+T["parsers.unresolved_verbose renders non-numeric count as empty in text"] = function()
+  local items = parsers.unresolved_verbose({ "weird-link\tnotanum\tnotes/x.md" })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(items[1].text, "weird-link (count=) sources: notes/x.md")
+  MiniTest.expect.equality(items[1].filename, "notes/x.md")
+end
+
+T["parsers.unresolved_verbose preserves the full sources cell in text for four sources"] = function()
+  local src = "notes/a.md, notes/b.md, notes/c.md, notes/d.md"
+  local line = "link\t8\t" .. src
+  local items = parsers.unresolved_verbose({ line })
+  MiniTest.expect.equality(#items, 1)
+  MiniTest.expect.equality(items[1].filename, "notes/a.md")
+  MiniTest.expect.equality(items[1].text, "link (count=8) sources: " .. src)
+end
+
+T["parsers.unresolved_verbose parses mixed-shape fixture"] = function()
+  local spec_dir = vim.fn.fnamemodify(debug.getinfo(1, "S").source:sub(2), ":h")
+  local path = spec_dir .. "/fixtures/unresolved_verbose.txt"
+  local f = assert(io.open(path, "r"))
+  local body = f:read("*a")
+  f:close()
+  local lines = vim.split(body, "\n", { plain = true })
+  local items = parsers.unresolved_verbose(lines)
+
+  MiniTest.expect.equality(#items, 4)
+  MiniTest.expect.equality(
+    items[1],
+    item("notes/solo.md", 1, "solo (count=4) sources: notes/solo.md")
+  )
+  MiniTest.expect.equality(
+    items[2],
+    item("notes/m1.md", 1, "multi (count=2) sources: notes/m1.md, notes/m2.md")
+  )
+  MiniTest.expect.equality(items[3].filename, "")
+  MiniTest.expect.equality(items[3].text, "nogood (count=1) sources: nowhere")
+  MiniTest.expect.equality(
+    items[4],
+    item("notes/z.md", 1, "odd (count=) sources: notes/z.md")
+  )
+end
+
 return T

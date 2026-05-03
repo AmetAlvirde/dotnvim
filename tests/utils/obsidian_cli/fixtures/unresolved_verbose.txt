@@ -1,0 +1,6 @@
+solo	4	notes/solo.md
+multi	2	notes/m1.md, notes/m2.md
+nogood	1	nowhere
+bad-shape
+
+odd	notanum	notes/z.md

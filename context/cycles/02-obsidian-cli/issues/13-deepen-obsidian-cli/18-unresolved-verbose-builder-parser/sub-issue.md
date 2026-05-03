@@ -1,5 +1,7 @@
 # Sub-issue — unresolved_verbose builder + parser (TSV link/count/sources)
 
+**Status: closed** — see `18-unresolved-verbose-builder-parser/aar.md`.
+
 GitHub issue: #18 (folder slug per ADR-0002 — confirm at activation; rename if
 the actual issue gets a different number). Fifth sub-issue of parent #13. The
 fourth parser-pass slice after #15 (`search_context`), #16 (`paths`), and #17
@@ -167,38 +169,38 @@ committed.
 
 ## Acceptance criteria
 
-- [ ] `tests/utils/obsidian_cli/command_spec.lua` is extended with one case
+- [x] `tests/utils/obsidian_cli/command_spec.lua` is extended with one case
       asserting `command.unresolved()` returns the exact static string
       `"obsidian unresolved verbose"`. The existing `search_context`,
       `command.orphans` / `command.deadends`, and `command.tasks` cases
       remain unchanged and green.
-- [ ] `tests/utils/obsidian_cli/parsers_spec.lua` is extended with at least
+- [x] `tests/utils/obsidian_cli/parsers_spec.lua` is extended with at least
       nine new cases for `parsers.unresolved_verbose` covering: single-source
       TSV, comma-separated multi-source TSV, multiple TSV lines, no-`.md`
       empty-filename fallback, `<3`-tab skip, empty/whitespace skip,
       non-numeric count, full-sources preservation in `text`, and a
       mixed-shape fixture-driven case. The existing `search_context`, `paths`,
       and `tasks_verbose` cases remain unchanged and green.
-- [ ] `tests/utils/obsidian_cli/fixtures/unresolved_verbose.txt` exists,
+- [x] `tests/utils/obsidian_cli/fixtures/unresolved_verbose.txt` exists,
       contains a hand-curated mixed-shape sample (single-source TSV +
       comma-separated multi-source TSV + no-`.md` source TSV + a `<3`-tab
       line + a blank line + a non-numeric-count TSV line), and is read by
       the mixed-input `parsers.unresolved_verbose` spec at runtime.
-- [ ] `./tests/run` exits 0 on the whole suite — the new cases plus
+- [x] `./tests/run` exits 0 on the whole suite — the new cases plus
       everything from #14, #15, #16, #17, plus cycle 01's
       `wordcount_spec.lua`.
-- [ ] `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` exits 0. No shell
+- [x] `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` exits 0. No shell
       call to `obsidian` happens during the new specs. (Carry-forward from
       #14 / #15 / #16 / #17 — the equivalent `PATH=/usr/bin:/bin` form fails
       because `nvim` lives in `/opt/homebrew/bin`; the spirit of the parent
       criterion is "obsidian absent from `$PATH`," which this form
       satisfies.)
-- [ ] No reaching into local functions or monkey-patching globals in the new
+- [x] No reaching into local functions or monkey-patching globals in the new
       cases. `parsers.unresolved_verbose` and `command.unresolved` are
       exercised through their public module surface only.
-- [ ] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is empty
+- [x] `git diff <cycle-base>..HEAD -- lua/config/commands.lua` is empty
       (carry-forward from parent — this slice does not edit the consumer).
-- [ ] `git diff <cycle-base>..HEAD -- lua/utils/obsidian_cli/` shows no
+- [x] `git diff <cycle-base>..HEAD -- lua/utils/obsidian_cli/` shows no
       changes other than fixes-with-test (if any). Speculative parser or
       builder changes are out of scope.
 

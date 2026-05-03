@@ -51,4 +51,8 @@ T["command.tasks({ only_todo = false }) returns obsidian tasks verbose"] = funct
   MiniTest.expect.equality(command.tasks({ only_todo = false }), "obsidian tasks verbose")
 end
 
+T["command.unresolved returns the static obsidian unresolved verbose string"] = function()
+  MiniTest.expect.equality(command.unresolved(), "obsidian unresolved verbose")
+end
+
 return T

@@ -24,11 +24,12 @@ contract (acceptance criteria, implementation approach, flags).
       module load. No `M.*` function on `init.lua` accepts a runner
       parameter.
 - [ ] Every output parser introduced or extracted by the deepening has
-      at least one passing unit test under `tests/utils/obsidian_cli/`,
-      exercised by `./tests/run`. The test directory layout mirrors
-      `lua/`. *(Progress as of #17: 3 of 6 parsers have dedicated specs —
-      `search_context` [#15], `paths` [#16], `tasks_verbose` [#17]. Remaining:
-      `unresolved_verbose`, `backlinks_json`, `extract_bookmark_note_path`.)*
+  at least one passing unit test under `tests/utils/obsidian_cli/`,
+  exercised by `./tests/run`. The test directory layout mirrors
+  `lua/`. *(Progress as of #18: 4 of 6 parsers have dedicated specs —
+  `search_context` [#15], `paths` [#16], `tasks_verbose` [#17],
+  `unresolved_verbose` [#18]. Remaining: `backlinks_json`,
+  `extract_bookmark_note_path`.)*
 - [x] At least one parser has a mutation test: temporarily breaking
       the parser causes its spec to fail; reverting causes it to
       pass. Recorded in the closing sub-issue's AAR. *(#15
