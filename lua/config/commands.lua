@@ -28,77 +28,37 @@ register({
   args = function(_) return { { only_todo = true } } end,
 })
 
-vim.api.nvim_create_user_command("ObsCLITaskToggle", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local success, msg = obscli.toggle_task_from_quickfix()
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "Toggle selected Obsidian task (from quickfix)" })
+register({
+  name = "ObsCLITaskToggle",
+  desc = "Toggle selected Obsidian task (from quickfix)",
+  module = "utils.obsidian_cli",
+  fn = "toggle_task_from_quickfix",
+})
 
 -- ===================================================
 -- Obsidian CLI (commands-only; batch 1 feature #3)
 -- ===================================================
 
-vim.api.nvim_create_user_command("ObsCLIOrphans", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
+register({
+  name = "ObsCLIOrphans",
+  desc = "List Obsidian orphan notes into quickfix",
+  module = "utils.obsidian_cli",
+  fn = "orphans_to_quickfix",
+})
 
-  local success, msg = obscli.orphans_to_quickfix()
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "List Obsidian orphan notes into quickfix" })
+register({
+  name = "ObsCLIDeadends",
+  desc = "List Obsidian dead-end notes into quickfix",
+  module = "utils.obsidian_cli",
+  fn = "deadends_to_quickfix",
+})
 
-vim.api.nvim_create_user_command("ObsCLIDeadends", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local success, msg = obscli.deadends_to_quickfix()
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "List Obsidian dead-end notes into quickfix" })
-
-vim.api.nvim_create_user_command("ObsCLIUnresolved", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local success, msg = obscli.unresolved_to_quickfix()
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "List Obsidian unresolved links (verbose) into quickfix" })
+register({
+  name = "ObsCLIUnresolved",
+  desc = "List Obsidian unresolved links (verbose) into quickfix",
+  module = "utils.obsidian_cli",
+  fn = "unresolved_to_quickfix",
+})
 
 -- ===================================================
 -- Obsidian CLI (commands-only; batch 1 feature #5)
@@ -131,22 +91,12 @@ end, { desc = "Search Obsidian vault with context (quickfix)" })
 -- Obsidian CLI (commands-only; batch 1 feature #6)
 -- ===================================================
 
-vim.api.nvim_create_user_command("ObsCLIHistory", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local success, msg = obscli.history_list_current()
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "Show Obsidian local history for current file" })
+register({
+  name = "ObsCLIHistory",
+  desc = "Show Obsidian local history for current file",
+  module = "utils.obsidian_cli",
+  fn = "history_list_current",
+})
 
 vim.api.nvim_create_user_command("ObsCLIHistoryRead", function(opts)
   local ok, obscli = pcall(require, "utils.obsidian_cli")
@@ -319,22 +269,12 @@ end, {
 -- Obsidian CLI (commands-only; batch 2 feature #15)
 -- ===================================================
 
-vim.api.nvim_create_user_command("ObsCLIBookmarks", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local success, msg = obscli.bookmarks_list_verbose()
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "List Obsidian bookmarks (verbose) in a scratch buffer" })
+register({
+  name = "ObsCLIBookmarks",
+  desc = "List Obsidian bookmarks (verbose) in a scratch buffer",
+  module = "utils.obsidian_cli",
+  fn = "bookmarks_list_verbose",
+})
 
 vim.api.nvim_create_user_command("ObsCLIBookmarkAdd", function(opts)
   local ok, obscli = pcall(require, "utils.obsidian_cli")
