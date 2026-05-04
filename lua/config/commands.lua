@@ -1,6 +1,8 @@
 -- User commands (not autocmds).
 -- Kept separate so `lua/config/autocmds.lua` stays focused on actual events.
 
+local register = require("config.commands_registrar").register
+
 -- Manual theme switching commands
 vim.api.nvim_create_user_command("SolarizedToggle", function()
   require("colors.solarized").toggle()
@@ -18,22 +20,13 @@ end, { desc = "Set Solarized theme to light mode" })
 -- Obsidian CLI (commands-only; batch 1 feature #2)
 -- ===================================================
 
-vim.api.nvim_create_user_command("ObsCLITasks", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local success, msg = obscli.tasks_to_quickfix({ only_todo = true })
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "List Obsidian TODO tasks into quickfix" })
+register({
+  name = "ObsCLITasks",
+  desc = "List Obsidian TODO tasks into quickfix",
+  module = "utils.obsidian_cli",
+  fn = "tasks_to_quickfix",
+  args = function(_) return { { only_todo = true } } end,
+})
 
 vim.api.nvim_create_user_command("ObsCLITaskToggle", function()
   local ok, obscli = pcall(require, "utils.obsidian_cli")

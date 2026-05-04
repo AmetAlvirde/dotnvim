@@ -60,11 +60,16 @@ approach, flags).
 - [ ] No reaching into local functions or monkey-patching internals
       anywhere in the new specs. Carry-forward acceptance criterion
       from cycles 01 and 02, still binding.
-- [ ] **Resolved-through-implementation decision recorded:**
-      registrar location (`lua/config/commands_registrar.lua`,
-      local table inside `commands.lua`, or promoted to
-      `lua/utils/`). Recorded in this file under
-      "Implementation approach" once the first sub-issue closes.
+- [x] **Resolved-through-implementation decision recorded:**
+      registrar location → `lua/config/commands_registrar.lua`.
+      Reason: lowest-friction option that is `require`-able and
+      testable in isolation without top-level side-effects from
+      `commands.lua`. Promotion to `lua/utils/` deferred until a
+      second consumer surfaces (none in cycle 03 scope). Spec-row
+      schema confirmed as Alternative A (keys: `name`, `desc`,
+      `module`, `fn`; optional `args`, `on_load_error`; optional
+      forwards `nargs`/`complete`/`range`/`bang` deferred).
+      Recorded in sub-issue #23 AAR. First sub-issue closed.
 - [ ] **Resolved-through-implementation decision recorded:** whether
       Candidate F (domain split of `commands.lua` by `solarized` /
       `obsidian_cli` / `wordcount`) lands as a closing sub-issue or
@@ -114,26 +119,17 @@ to model these via a `kind = "void"` spec variant, a separate
 `set_theme` and `toggle` are wrapped in tiny adapters that return
 `(true, "")`. Record the choice here once landed.
 
-### Layout (resolved through implementation — record in first sub-issue)
+### Layout (resolved in sub-issue #23)
 
-Three options surface from PRD open question #2:
+**Chosen: `lua/config/commands_registrar.lua`** (option 1).
 
-1. **Co-located in `lua/config/`:** new module
-   `lua/config/commands_registrar.lua`. `commands.lua` does
-   `local register = require("config.commands_registrar").register`
-   and feeds it spec rows. Lowest-friction starting point.
-2. **Local table inside `commands.lua`:** the registrar lives as a
-   local function at the top of the same file. Avoids a new module;
-   tests `require` `commands.lua` and exercise an exported handle.
-   Risk: harder to test in isolation if `commands.lua` has top-level
-   side effects.
-3. **Promoted to `lua/utils/`:** `lua/utils/commands_registrar.lua`.
-   Justified only if a second consumer surfaces during A's
-   implementation. Default: defer until that consumer exists.
-
-Decide at the first sub-issue (the tracer slice) once a working spec
-row and its test are in hand. Record the chosen option here with a
-one-sentence reason.
+`commands.lua` does `local register = require("config.commands_registrar").register`
+and feeds it spec rows. The registrar is `require`-able and testable
+in isolation without top-level side effects from `commands.lua`.
+Option 2 (local table) was rejected because a local function cannot be
+exercised by a spec without monkey-patching `commands.lua`'s top-level
+state. Option 3 (promote to `lua/utils/`) is deferred until a second
+consumer surfaces; none exists in cycle 03 scope.
 
 ### Test pattern (the seam this parent issue establishes for B and D)
 
