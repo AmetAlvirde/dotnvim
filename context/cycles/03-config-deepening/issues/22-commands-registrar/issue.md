@@ -113,11 +113,15 @@ The registrar:
 
 The Solarized commands use a thinner shape — they call into
 `colors.solarized.set_theme("dark")` / `toggle()` and do not return
-the `(success, msg)` envelope. Decide in the first sub-issue whether
-to model these via a `kind = "void"` spec variant, a separate
-`commands.register_void(spec)` entry point, or by accepting that
-`set_theme` and `toggle` are wrapped in tiny adapters that return
-`(true, "")`. Record the choice here once landed.
+the `(success, msg)` envelope. Resolved in sub-issue #26: the
+registrar accepts an optional `kind = "void"` spec-row key; when
+set, the callback calls the leaf and discards the return without
+unpacking any `(success, msg)` tuple. Alternative B (a separate
+`register_void` entry point) was rejected because it would break the
+single-registration-mechanism principle and grow test surface per
+shape. Alternative C (tiny `(true, "")` adapters) was rejected
+because it either violates the no-edits-to-solarized.lua constraint
+or adds adapter-module machinery with no payoff over A.
 
 ### Layout (resolved in sub-issue #23)
 

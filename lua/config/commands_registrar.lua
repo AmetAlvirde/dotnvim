@@ -13,6 +13,10 @@ local function register(spec)
       return
     end
     local args = spec.args and spec.args(cmd_opts) or {}
+    if spec.kind == "void" then
+      mod[spec.fn](unpack(args))
+      return
+    end
     local success, msg = mod[spec.fn](unpack(args))
     if not success then
       vim.notify(msg, vim.log.levels.ERROR)

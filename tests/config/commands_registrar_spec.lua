@@ -126,6 +126,72 @@ T["register: leaf returns (true, non-empty msg): one INFO notify with msg"] = fu
   package.loaded[stub_key] = nil
 end
 
+-- kind = "void" cases.
+
+T["register: kind = \"void\" calls leaf with unpacked args and emits no notify"] = function()
+  local stub_key = "stub.registrar.void_leaf"
+  local call_args = nil
+  package.loaded[stub_key] = {
+    run = function(...)
+      call_args = { ... }
+    end,
+  }
+
+  register({
+    name = "VoidCmd",
+    desc = "Void",
+    module = stub_key,
+    fn = "run",
+    kind = "void",
+    args = function(_) return { "dark" } end,
+  })
+  recorded_commands[1].callback({})
+
+  MiniTest.expect.equality(#recorded_notifies, 0)
+  MiniTest.expect.equality(call_args, { "dark" })
+
+  package.loaded[stub_key] = nil
+end
+
+T["register: kind = \"void\" discards leaf return value"] = function()
+  local stub_key = "stub.registrar.void_discard"
+  package.loaded[stub_key] = {
+    run = function() return true, "msg that must not fire" end,
+  }
+
+  register({
+    name = "VoidDiscardCmd",
+    desc = "Void discard",
+    module = stub_key,
+    fn = "run",
+    kind = "void",
+  })
+  recorded_commands[1].callback({})
+
+  MiniTest.expect.equality(#recorded_notifies, 0)
+
+  package.loaded[stub_key] = nil
+end
+
+T["register: kind = \"void\" still surfaces load failure as ERROR notify"] = function()
+  register({
+    name = "VoidLoadFailCmd",
+    desc = "Void load fail",
+    module = "utils.does_not_exist",
+    fn = "noop",
+    kind = "void",
+  })
+
+  recorded_commands[1].callback({})
+
+  MiniTest.expect.equality(#recorded_notifies, 1)
+  MiniTest.expect.equality(recorded_notifies[1].level, vim.log.levels.ERROR)
+  MiniTest.expect.equality(
+    recorded_notifies[1].msg,
+    "Failed to load utils.does_not_exist"
+  )
+end
+
 -- nargs forwarding cases.
 
 T["register: forwards spec.nargs to opts.nargs"] = function()

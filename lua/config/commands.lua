@@ -4,17 +4,31 @@
 local register = require("config.commands_registrar").register
 
 -- Manual theme switching commands
-vim.api.nvim_create_user_command("SolarizedToggle", function()
-  require("colors.solarized").toggle()
-end, { desc = "Toggle Solarized theme between dark and light" })
+register({
+  name = "SolarizedToggle",
+  desc = "Toggle Solarized theme between dark and light",
+  module = "colors.solarized",
+  fn = "toggle",
+  kind = "void"
+})
 
-vim.api.nvim_create_user_command("SolarizedDark", function()
-  require("colors.solarized").set_theme("dark")
-end, { desc = "Set Solarized theme to dark mode" })
+register({
+  name = "SolarizedDark",
+  desc = "Set Solarized theme to dark mode",
+  module = "colors.solarized",
+  fn = "set_theme",
+  kind = "void",
+  args = function(_) return { "dark" }  end
+})
 
-vim.api.nvim_create_user_command("SolarizedLight", function()
-  require("colors.solarized").set_theme("light")
-end, { desc = "Set Solarized theme to light mode" })
+register({
+  name = "SolarizedLight",
+  desc = "Set Solarized theme to light mode",
+  module = "colors.solarized",
+  fn = "set_theme",
+  kind = "void",
+  args = function(_) return { "light" } end
+})
 
 -- ===================================================
 -- Obsidian CLI (commands-only; batch 1 feature #2)
