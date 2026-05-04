@@ -1,0 +1,10 @@
+notes/work.md
+  12: - [ ] Write the spec
+  18: - [ ] Land the PR
+
+notes/journal.md
+  5 Morning checklist
+
+notes/standalone.md:7: inline task
+
+notes/fake.md:42: artifact

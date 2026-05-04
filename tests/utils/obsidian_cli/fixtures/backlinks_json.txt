@@ -1,0 +1,7 @@
+{
+  "backlinks": [
+    {"path": "notes/alpha.md", "count": 3},
+    {"file": "notes/beta.md", "linkCount": 7},
+    {"path": "notes/gamma.md"}
+  ]
+}

@@ -1,0 +1,8 @@
+notes/foo.md:42: matched text
+
+notes/bar.md:7  prefix matched after space branch
+notes/baz.md	13	rest of text via tsv
+
+   
+
+total: 12
