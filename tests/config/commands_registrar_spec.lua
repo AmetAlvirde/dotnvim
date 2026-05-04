@@ -126,4 +126,32 @@ T["register: leaf returns (true, non-empty msg): one INFO notify with msg"] = fu
   package.loaded[stub_key] = nil
 end
 
+-- nargs forwarding cases.
+
+T["register: forwards spec.nargs to opts.nargs"] = function()
+  register({
+    name = "NargsCmd",
+    desc = "A nargs command",
+    module = "utils.does_not_exist",
+    fn = "noop",
+    nargs = "?",
+  })
+
+  MiniTest.expect.equality(#recorded_commands, 1)
+  MiniTest.expect.equality(recorded_commands[1].opts.nargs, "?")
+  MiniTest.expect.equality(recorded_commands[1].opts.desc, "A nargs command")
+end
+
+T["register: omits opts.nargs when spec.nargs is nil"] = function()
+  register({
+    name = "NoNargsCmd",
+    desc = "No nargs command",
+    module = "utils.does_not_exist",
+    fn = "noop",
+  })
+
+  MiniTest.expect.equality(#recorded_commands, 1)
+  MiniTest.expect.equality(recorded_commands[1].opts.nargs, nil)
+end
+
 return T
