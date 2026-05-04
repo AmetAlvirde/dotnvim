@@ -192,6 +192,83 @@ T["register: kind = \"void\" still surfaces load failure as ERROR notify"] = fun
   )
 end
 
+-- abort-from-args cases.
+
+T["register: args returning (nil, msg, level) emits one notify and skips leaf"] = function()
+  local stub_key = "stub.registrar.abort_with_level"
+  local leaf_called = false
+  package.loaded[stub_key] = {
+    run = function() leaf_called = true; return true, "" end,
+  }
+
+  register({
+    name = "AbortCmd",
+    desc = "Abort",
+    module = stub_key,
+    fn = "run",
+    args = function(_) return nil, "abort msg", vim.log.levels.WARN end,
+  })
+  recorded_commands[1].callback({})
+
+  MiniTest.expect.equality(#recorded_notifies, 1)
+  MiniTest.expect.equality(recorded_notifies[1].msg, "abort msg")
+  MiniTest.expect.equality(recorded_notifies[1].level, vim.log.levels.WARN)
+  MiniTest.expect.equality(leaf_called, false)
+
+  package.loaded[stub_key] = nil
+end
+
+T["register: args returning (nil, msg) defaults level to WARN"] = function()
+  local stub_key = "stub.registrar.abort_default_level"
+  local leaf_called = false
+  package.loaded[stub_key] = {
+    run = function() leaf_called = true; return true, "" end,
+  }
+
+  register({
+    name = "AbortDefaultCmd",
+    desc = "Abort default level",
+    module = stub_key,
+    fn = "run",
+    args = function(_) return nil, "abort msg" end,
+  })
+  recorded_commands[1].callback({})
+
+  MiniTest.expect.equality(#recorded_notifies, 1)
+  MiniTest.expect.equality(recorded_notifies[1].msg, "abort msg")
+  MiniTest.expect.equality(recorded_notifies[1].level, vim.log.levels.WARN)
+  MiniTest.expect.equality(leaf_called, false)
+
+  package.loaded[stub_key] = nil
+end
+
+-- range forwarding cases.
+
+T["register: forwards spec.range to opts.range"] = function()
+  register({
+    name = "RangeCmd",
+    desc = "A range command",
+    module = "utils.does_not_exist",
+    fn = "noop",
+    range = true,
+  })
+
+  MiniTest.expect.equality(#recorded_commands, 1)
+  MiniTest.expect.equality(recorded_commands[1].opts.range, true)
+end
+
+T["register: omits opts.range when spec.range is nil"] = function()
+  register({
+    name = "NoRangeCmd",
+    desc = "No range command",
+    module = "utils.does_not_exist",
+    fn = "noop",
+  })
+
+  MiniTest.expect.equality(#recorded_commands, 1)
+  MiniTest.expect.equality(recorded_commands[1].opts.range, nil)
+end
+
 -- nargs forwarding cases.
 
 T["register: forwards spec.nargs to opts.nargs"] = function()
@@ -218,6 +295,54 @@ T["register: omits opts.nargs when spec.nargs is nil"] = function()
 
   MiniTest.expect.equality(#recorded_commands, 1)
   MiniTest.expect.equality(recorded_commands[1].opts.nargs, nil)
+end
+
+-- kind = "synthesized_notify" cases.
+
+T["register: kind = \"synthesized_notify\" calls notify with leaf returns and emits one notify"] = function()
+  local stub_key = "stub.registrar.synth_notify"
+  package.loaded[stub_key] = {
+    run = function() return 7 end,
+  }
+
+  register({
+    name = "SynthCmd",
+    desc = "Synthesized notify",
+    module = stub_key,
+    fn = "run",
+    kind = "synthesized_notify",
+    args = function(_) return { 42 } end,
+    notify = function(returns, cmd_opts)
+      return "got " .. returns[1] .. " at line " .. cmd_opts.line1, vim.log.levels.INFO
+    end,
+  })
+  recorded_commands[1].callback({ line1 = 3 })
+
+  MiniTest.expect.equality(#recorded_notifies, 1)
+  MiniTest.expect.equality(recorded_notifies[1].msg, "got 7 at line 3")
+  MiniTest.expect.equality(recorded_notifies[1].level, vim.log.levels.INFO)
+
+  package.loaded[stub_key] = nil
+end
+
+T["register: kind = \"synthesized_notify\" still surfaces load failure as ERROR notify"] = function()
+  register({
+    name = "SynthLoadFailCmd",
+    desc = "Synth load fail",
+    module = "utils.does_not_exist",
+    fn = "noop",
+    kind = "synthesized_notify",
+    notify = function() error("must not be called") end,
+  })
+
+  recorded_commands[1].callback({})
+
+  MiniTest.expect.equality(#recorded_notifies, 1)
+  MiniTest.expect.equality(recorded_notifies[1].level, vim.log.levels.ERROR)
+  MiniTest.expect.equality(
+    recorded_notifies[1].msg,
+    "Failed to load utils.does_not_exist"
+  )
 end
 
 return T

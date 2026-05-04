@@ -123,6 +123,66 @@ shape. Alternative C (tiny `(true, "")` adapters) was rejected
 because it either violates the no-edits-to-solarized.lua constraint
 or adds adapter-module machinery with no payoff over A.
 
+Three additional shape decisions resolved in sub-issue #27:
+
+**Decision 1 — Abort-from-`args` shape** (for `ObsCLISearchContext`'s
+WARN-level early return on empty prompt input). Chosen: Alternative A —
+`args` may return `(nil, msg, level)` to abort the dispatch with one
+notify; registrar inspects the multi-value return after evaluating
+`spec.args`. Alternative B (separate `validate` callback) was rejected
+because it bifurcates into two callbacks what is one decision ("should
+the leaf run?") and `args` is already the entry point for that
+decision. Alternative C (specialised `prompt` field) was rejected
+because it only fits the prompt-then-validate case; the generic
+abort-tuple mechanism covers prompt, range-required, and any future
+abort shape with one branch.
+
+**Decision 2 — `range` forwarding** (for `WordCount`'s `range = true`).
+Chosen: Alternative A — one conditional `if spec.range ~= nil then
+opts.range = spec.range end`, mirroring the existing `nargs` line.
+Alternative B (forward `complete`, `range`, `bang` all at once) was
+rejected because parent #22 explicitly defers `complete` and `bang`
+until a consumer needs them; adding their forwards now means three new
+test cases for branches no production row exercises.
+
+**Decision 3 — `kind = "synthesized_notify"` shape** (for `WordCount`'s
+custom INFO message synthesized from the leaf's return plus `cmd_opts`).
+Chosen: Alternative A — new `kind` value plus an optional `notify =
+function(returns, cmd_opts)` callback. Alternative B (inline adapter
+wrapping the leaf) was rejected because its clean form violates the
+no-edits-to-wordcount.lua constraint and its workaround forms add
+adapter-module machinery with no payoff. Alternative C
+(presence-of-`notify` as the discriminator, without a new `kind` value)
+was rejected because it makes `kind` and `notify`-presence two parallel
+discriminators, raising cross-product questions (e.g., `kind = "void"`
+plus `notify = fn`); keeping `kind` as the single discriminator
+preserves mutual exclusivity across branches.
+
+Spec-row schema after sub-issue #27:
+
+```lua
+register({
+  name          = "...",   -- required
+  desc          = "...",   -- required
+  module        = "...",   -- required
+  fn            = "...",   -- required
+  args          = function(cmd_opts)
+                    -- single-table return → normal flow
+                    -- (nil, msg, level) → abort with notify
+                  end,                                            -- optional; default {}
+  on_load_error = "...",                                          -- optional
+  nargs         = "?" | "*" | "+" | <number> | <string>,          -- optional
+  range         = true | <integer> | <string>,                    -- optional; forwarded to opts.range
+  kind          = "void" | "synthesized_notify",                  -- optional
+  notify        = function(returns, cmd_opts) return msg, level end,
+                                                                  -- optional; used with kind = "synthesized_notify"
+})
+```
+
+`complete` and `bang` forwards remain deferred. Every user command in
+`commands.lua` is now registered through `commands.register`; zero
+direct `vim.api.nvim_create_user_command` calls remain.
+
 ### Layout (resolved in sub-issue #23)
 
 **Chosen: `lua/config/commands_registrar.lua`** (option 1).

@@ -78,28 +78,19 @@ register({
 -- Obsidian CLI (commands-only; batch 1 feature #5)
 -- ===================================================
 
-vim.api.nvim_create_user_command("ObsCLISearchContext", function()
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local query = vim.fn.input("Obsidian search query: ")
-  if not query or vim.trim(query) == "" then
-    vim.notify("Search query required.", vim.log.levels.WARN)
-    return
-  end
-
-  local success, msg = obscli.search_context_to_quickfix(query)
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, { desc = "Search Obsidian vault with context (quickfix)" })
+register({
+  name = "ObsCLISearchContext",
+  desc = "Search Obsidian vault with context (quickfix)",
+  module = "utils.obsidian_cli",
+  fn = "search_context_to_quickfix",
+  args = function(_)
+    local q = vim.fn.input("Obsidian search query: ")
+    if not q or vim.trim(q) == "" then
+      return nil, "Search query required.", vim.log.levels.WARN
+    end
+    return { vim.trim(q) }
+  end,
+})
 
 -- ===================================================
 -- Obsidian CLI (commands-only; batch 1 feature #6)
@@ -184,68 +175,60 @@ register({
 -- Buffer word count (whitespace-separated words)
 -- ===================================================
 
-vim.api.nvim_create_user_command("WordCount", function(opts)
-  local ok, wc = pcall(require, "utils.wordcount")
-  if not ok then
-    vim.notify("Failed to load utils.wordcount", vim.log.levels.ERROR)
-    return
-  end
-  local n = wc.buf_line_range_wordcount(0, opts.line1, opts.line2)
-  vim.notify(
-    string.format("%d word%s (lines %d–%d)", n, n == 1 and "" or "s", opts.line1, opts.line2),
-    vim.log.levels.INFO
-  )
-end, {
-  range = true,
+register({
+  name = "WordCount",
   desc = "Count whitespace-separated words in range (default: current line; use % or '<,'>)",
+  module = "utils.wordcount",
+  fn = "buf_line_range_wordcount",
+  range = true,
+  kind = "synthesized_notify",
+  args = function(opts) return { 0, opts.line1, opts.line2 } end,
+  notify = function(returns, cmd_opts)
+    local n = returns[1]
+    return string.format(
+      "%d word%s (lines %d–%d)",
+      n, n == 1 and "" or "s", cmd_opts.line1, cmd_opts.line2
+    ), vim.log.levels.INFO
+  end,
 })
 
 -- ===================================================
 -- Obsidian CLI (commands-only; batch 2 feature #13)
 -- ===================================================
 
-vim.api.nvim_create_user_command("ObsCLIWordCount", function(opts)
-  local ok, obscli = pcall(require, "utils.obsidian_cli")
-  if not ok then
-    vim.notify("Failed to load utils.obsidian_cli", vim.log.levels.ERROR)
-    return
-  end
-
-  local fargs = opts.fargs or {}
-  local path_parts = {}
-  for i, v in ipairs(fargs) do
-    path_parts[i] = v
-  end
-
-  local mode = "full"
-  local n = #path_parts
-  if n > 0 then
-    local last = path_parts[n]:lower()
-    if last == "words" or last == "word" then
-      mode = "words"
-      table.remove(path_parts, n)
-    elseif last == "characters" or last == "chars" or last == "character" then
-      mode = "characters"
-      table.remove(path_parts, n)
-    end
-  end
-
-  local path_rel = nil
-  if #path_parts > 0 then
-    path_rel = table.concat(path_parts, " ")
-  end
-
-  local success, msg = obscli.wordcount_current({ path_rel = path_rel, mode = mode })
-  if not success then
-    vim.notify(msg, vim.log.levels.ERROR)
-    return
-  end
-  if msg and msg ~= "" then
-    vim.notify(msg, vim.log.levels.INFO)
-  end
-end, {
+register({
+  name = "ObsCLIWordCount",
   desc = "Obsidian wordcount (optional vault path; optional trailing words|characters)",
+  module = "utils.obsidian_cli",
+  fn = "wordcount_current",
   nargs = "*",
+  args = function(cmd_opts)
+    local fargs = cmd_opts.fargs or {}
+    local path_parts = {}
+    for i, v in ipairs(fargs) do
+      path_parts[i] = v
+    end
+
+    local mode = "full"
+    local n = #path_parts
+    if n > 0 then
+      local last = path_parts[n]:lower()
+      if last == "words" or last == "word" then
+        mode = "words"
+        table.remove(path_parts, n)
+      elseif last == "characters" or last == "chars" or last == "character" then
+        mode = "characters"
+        table.remove(path_parts, n)
+      end
+    end
+
+    local path_rel = nil
+    if #path_parts > 0 then
+      path_rel = table.concat(path_parts, " ")
+    end
+
+    return { { path_rel = path_rel, mode = mode } }
+  end,
 })
 
 -- ===================================================
