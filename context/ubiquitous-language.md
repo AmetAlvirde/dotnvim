@@ -45,8 +45,21 @@
 
 ## Example dialogue
 
-<!-- Add 3–5 exchanges once enough terms exist to surface a non-obvious
-     boundary. Skip until the glossary has real entries. -->
+> **Dev:** "The bookmark parser is returning the absolute path instead of
+> the vault-relative one." **Domain expert:** "The Obsidian CLI emits
+> absolute paths for bookmarks; the parser has to subtract the vault root
+> to recover the vault-relative path. That subtraction is the resolver
+> seam introduced in #20."
+
+> **Dev:** "Should `wordcount_current` accept an absolute path or a
+> vault-relative one?" **Domain expert:** "Vault-relative. The Obsidian
+> CLI takes `path=` arguments as vault-relative paths; if a caller has an
+> absolute path, it converts against the vault root first."
+
+> **Dev:** "What if the current buffer is outside any registered vault?"
+> **Domain expert:** "There is no vault root that anchors it, so there is
+> no vault-relative path to derive. The leaf function returns its
+> not-in-a-vault error envelope and the user command notifies."
 
 ## Flagged ambiguities
 
