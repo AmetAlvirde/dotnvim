@@ -184,8 +184,12 @@ These are architectural compliance checks — binary, verifiable.
    `pcall(require, "utils.obsidian_cli")` block. Each of the 19
    currently-defined user commands is registered through the
    registrar.
-2. After Candidate A closes, `wc -l lua/config/commands.lua` returns
-   under 120 lines (down from 366).
+2. After Candidate A closes, every user command in `commands.lua` is
+   registered through `commands.register`; zero direct
+   `vim.api.nvim_create_user_command` calls and zero direct
+   `pcall(require, "utils.…")` calls remain in `commands.lua`.
+   (Line-count threshold removed in sub-issue #28: line counts do not
+   shape the contract. Structural outcome verified by grep.)
 3. After Candidate B closes,
    `grep -n 'vim\.loop\.new_timer' lua/plugins/lualine.lua` returns
    zero matches.

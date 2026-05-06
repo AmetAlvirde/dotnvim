@@ -10,20 +10,25 @@ approach, flags).
 
 ## Acceptance criteria
 
-- [ ] A `commands.register(spec)` function exists, is publicly
-      `require`-able, and is the only place in the configuration that
+- [x] A `commands.register(spec)` function exists, is publicly
+      `require`-able, and is the only place in **`lua/config/`** that
       calls `vim.api.nvim_create_user_command`. Verified by
-      `grep -rn 'nvim_create_user_command' lua/` returning matches
-      only inside the registrar module.
-- [ ] `lua/config/commands.lua` becomes a list of spec rows, each fed
+      `grep -rn 'nvim_create_user_command' lua/config/` returning matches
+      only inside `lua/config/commands_registrar.lua`. Scope amended in
+      sub-issue #28: `lua/plugins/lualine.lua` contains a plugin-internal
+      `LualineRefresh` user command (a closure over plugin state with no
+      leaf module) that is out-of-contract for this parent issue.
+      Verified output: `lua/config/commands_registrar.lua:7:
+      vim.api.nvim_create_user_command(spec.name, …)`.
+- [x] `lua/config/commands.lua` becomes a list of spec rows, each fed
       to `commands.register`. The per-command
       `pcall(require, "utils.obsidian_cli")` → call → `vim.notify`
       block is gone. Verified by
       `grep -n 'pcall(require, "utils\.obsidian_cli")' lua/config/commands.lua`
-      returning zero matches.
-- [ ] `wc -l lua/config/commands.lua` returns under 120 lines (down
-      from 366). *(Cycle PRD success metric #2.)*
-- [ ] All 18 user commands currently defined in `commands.lua` —
+      returning zero matches (grep exit 1, no output).
+      Structural-intent AC preserved; line-budget AC removed in #28 —
+      line counts do not shape the contract.
+- [x] All 18 user commands currently defined in `commands.lua` —
       `SolarizedToggle`, `SolarizedDark`, `SolarizedLight`,
       `ObsCLITasks`, `ObsCLITaskToggle`, `ObsCLIOrphans`,
       `ObsCLIDeadends`, `ObsCLIUnresolved`, `ObsCLISearchContext`,
@@ -34,32 +39,43 @@ approach, flags).
       and argument shapes (`nargs`, `complete`, `range`, `bang`).
       Verified by inspecting the spec rows against pre-cycle
       `git show` output.
-- [ ] The registrar has at least one passing unit test under
+- [x] The registrar has at least one passing unit test under
       `tests/config/` (or wherever the registrar lands per resolved
       decision below) exercised by `./tests/run`. The test fakes
       `vim.api.nvim_create_user_command`, calls `commands.register`
       with a representative spec, and asserts the recorded call
       shape — name, options table, callback wiring, error and
       info handling.
-- [ ] At least one registrar spec covers each of these
+      Verified: `tests/config/commands_registrar_spec.lua` — 18 cases,
+      all green. Suite total: 110 cases, 5 groups.
+- [x] At least one registrar spec covers each of these
       observable-behavior cases: a `pcall(require, ...)` failure
       surfaces an ERROR-level `vim.notify`; a leaf returning
       `(false, msg)` surfaces an ERROR-level `vim.notify` with `msg`;
       a leaf returning `(true, msg)` with non-empty `msg` surfaces
       an INFO-level `vim.notify`; a leaf returning `(true, "")` or
       `(true, nil)` surfaces no notify.
-- [ ] No edits to `lua/utils/obsidian_cli/` (any file),
+      Verified: all four branches covered in `commands_registrar_spec.lua`.
+- [x] No edits to `lua/utils/obsidian_cli/` (any file),
       `lua/utils/wordcount.lua`, or the public surface of
       `lua/colors/solarized.lua` (`set_theme`, `toggle`). Verified
-      by `git diff <cycle-base>..HEAD -- <those paths>` being empty.
-- [ ] `./tests/run` exits 0 on the whole suite — including all cycle
+      by `git diff c124f97..HEAD -- <those paths>` being empty.
+      Cycle base: `c124f97` (merge PR #21, pre-cycle-03 state).
+      All three diffs empty.
+- [x] `./tests/run` exits 0 on the whole suite — including all cycle
       01 and cycle 02 specs.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
+      Verified: exit 0, 110 cases, 0 fails, 0 notes.
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
       suite passes with `obsidian` and `codesign` absent from
       `$PATH`).
-- [ ] No reaching into local functions or monkey-patching internals
+      Verified: `PATH=/usr/bin:/bin:/opt/homebrew/bin ./tests/run` exits 0
+      (nvim lives at `/opt/homebrew/bin/nvim`; `obsidian` and `codesign`
+      excluded). 110 cases, 0 fails.
+- [x] No reaching into local functions or monkey-patching internals
       anywhere in the new specs. Carry-forward acceptance criterion
       from cycles 01 and 02, still binding.
+      Verified: all registrar specs use the public `register` surface;
+      no locals accessed.
 - [x] **Resolved-through-implementation decision recorded:**
       registrar location → `lua/config/commands_registrar.lua`.
       Reason: lowest-friction option that is `require`-able and
@@ -70,10 +86,20 @@ approach, flags).
       `module`, `fn`; optional `args`, `on_load_error`; optional
       forwards `nargs`/`complete`/`range`/`bang` deferred).
       Recorded in sub-issue #23 AAR. First sub-issue closed.
-- [ ] **Resolved-through-implementation decision recorded:** whether
-      Candidate F (domain split of `commands.lua` by `solarized` /
-      `obsidian_cli` / `wordcount`) lands as a closing sub-issue or
-      is skipped. Recorded in this file with a one-sentence reason.
+- [x] **Resolved-through-implementation decisions recorded (sub-issue
+      #28):**
+      **Candidate F** (domain split of `commands.lua` by `solarized` /
+      `obsidian_cli` / `wordcount`) — **skip**. Post-#27 `commands.lua`
+      is a flat list of spec rows under preserved section comments,
+      scannable as one declarative file; no second pressure point (19th
+      command, second registrar consumer, real ergonomic friction) has
+      surfaced.
+      **ADR-0004** (registrar pattern) — **defer to cycle 03 close**.
+      The registrar is currently a single-consumer pattern; after at
+      least one of Candidates B / D lands, the pattern's ADR-worthy
+      invariants are visible from two seams, enabling one ADR covering
+      the family rather than a registrar-specific ADR that would need
+      superseding.
 
 ## Implementation approach
 

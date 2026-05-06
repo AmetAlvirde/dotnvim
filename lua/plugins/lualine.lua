@@ -154,7 +154,8 @@ return {
       desc = 'Refresh lualine theme when colorscheme changes'
     })
 
-    -- Also create a custom command to manually refresh lualine
+    -- Plugin-internal user command (out of commands.register's contract);
+    -- see context/cycles/03-config-deepening/issues/22-commands-registrar/issue.md.
     vim.api.nvim_create_user_command('LualineRefresh', function()
       setup_lualine()
       vim.cmd("redrawstatus")
