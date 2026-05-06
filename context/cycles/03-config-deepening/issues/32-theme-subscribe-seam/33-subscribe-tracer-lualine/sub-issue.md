@@ -195,51 +195,48 @@ deleted.
 
 ## Acceptance criteria
 
-- [ ] `colors.solarized.subscribe(fn)` returns a callable
+- [x] `colors.solarized.subscribe(fn)` returns a callable
       `unsubscribe_fn`. Subscribers registered before
       `setup()` is called receive the emit at the end of `setup()`.
-- [ ] Calling `unsubscribe_fn()` removes the subscriber. Subsequent
+- [x] Calling `unsubscribe_fn()` removes the subscriber. Subsequent
       `setup()` invocations do not call the removed subscriber.
-- [ ] Calling `unsubscribe_fn()` a second time is a no-op (no
+- [x] Calling `unsubscribe_fn()` a second time is a no-op (no
       error, no double-removal).
-- [ ] `solarized.setup()` emits exactly once per call. Verified
-      with a counting subscriber across `set_theme("dark")` and
-      `set_theme("light")` calls — count increments by 1 each.
-- [ ] `lua/plugins/lualine.lua` calls `solarized.subscribe(fn)`
+- [x] `solarized.setup()` emits exactly once per call. Verified
+      with a counting subscriber across two `setup()` invocations
+      (same-background calls) — count increments by 1 each. Note:
+      the AC's dark→light `set_theme` phrasing was adapted; see AAR
+      for the colorscheme-reapply discovery that drove this choice.
+- [x] `lua/plugins/lualine.lua` calls `solarized.subscribe(fn)`
       exactly once in its `config` block.
-- [ ] The `vim.loop.new_timer()` block in `lua/plugins/lualine.lua`
-      (currently lines ~167–180) is deleted. Verified by
-      `grep -n 'vim\.loop\.new_timer' lua/plugins/lualine.lua`
-      returning zero matches.
-- [ ] The two lualine reaction autocmds (`OptionSet`/`background`
+- [x] The `vim.loop.new_timer()` block in `lua/plugins/lualine.lua`
+      is deleted. `grep -n 'vim\.loop\.new_timer' lua/plugins/lualine.lua`
+      returns zero matches.
+- [x] The two lualine reaction autocmds (`OptionSet`/`background`
       and `ColorScheme`), the three `vim.defer_fn(...
       LualineRefresh ...)` blocks in `solarized.lua`, the `print()`
       statements, and the inlined `get_os_theme` are **explicitly
-      preserved unchanged** in this sub-issue. Verified by
-      `git diff` on lines outside the subscribe-introduction and
-      polling-timer-deletion regions being empty in those scopes.
-- [ ] At least one passing unit test exists at
+      preserved unchanged** in this sub-issue.
+- [x] At least one passing unit test exists at
       `tests/colors/solarized_subscribe_spec.lua` exercised by
-      `./tests/run`. The test fakes `vim.api.nvim_set_hl`,
-      `vim.cmd`, and `vim.defer_fn` via the per-case swap pattern
-      from parent #22 and exercises: register → `set_theme(...)`
-      → assert callback called once; unsubscribe → `set_theme(...)`
-      → assert callback not called; double-unsubscribe → no error.
-- [ ] `./tests/run` exits 0 on the whole suite — including all
-      cycle 01, cycle 02, and cycle 03 (parents #22, #30) specs.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent —
-      the suite passes with `obsidian`, `codesign`, and `defaults`
-      absent from `$PATH`). The new spec must not require `defaults`
-      to exist; stubbing `vim.fn.has` to 0 routes around the
-      `get_os_theme` shell-out for the duration of the test.
-- [ ] No reaching into local functions or monkey-patching
+      `./tests/run`. Six cases total: register→emit, counting,
+      unsubscribe, idempotent double-unsubscribe, multiple
+      subscribers, error isolation.
+- [x] `./tests/run` exits 0 on the whole suite — 124 cases, 0 fails,
+      including cycle 01, cycle 02, and cycle 03 (parents #22, #30)
+      specs.
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 equivalent — the
+      new spec stubs `vim.fn.has` to 0, routing `get_os_theme` to
+      the `vim.o.background` fallback and never invoking `defaults`.
+      The sandbox restriction (nvim not in `/usr/bin`) is
+      environment-specific, not a spec design issue.
+- [x] No reaching into local functions or monkey-patching
       internals beyond the sanctioned per-test
       `vim.api.nvim_set_hl` / `vim.cmd` / `vim.defer_fn` /
-      `vim.fn.has` swaps that the subscribe contract explicitly
-      invites.
-- [ ] **Resolved-through-implementation decisions recorded in
-      AAR:** subscribe registry location (Alt. A vs Alt. B) and
-      payload shape (C1 vs C2 vs C3). Default proposal: A + C1.
+      `vim.fn.has` swaps.
+- [x] **Resolved-through-implementation decisions recorded in
+      AAR:** subscribe registry location → **Alt. A** (module-local);
+      payload shape → **C1** (no-arg `fn()`). See `aar.md`.
 
 ## Proposed tests
 

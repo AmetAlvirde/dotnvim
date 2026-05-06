@@ -124,6 +124,14 @@ return {
     -- Initial setup
     setup_lualine()
 
+    -- Subscribe to theme changes; re-applies lualine theme whenever solarized.setup() emits.
+    solarized.subscribe(function()
+      vim.defer_fn(function()
+        setup_lualine()
+        vim.cmd("redrawstatus")
+      end, 100)
+    end)
+
     -- Create autocmd to refresh lualine when background changes
     vim.api.nvim_create_autocmd('OptionSet', {
       pattern = 'background',
@@ -162,22 +170,6 @@ return {
       -- print("Lualine theme refreshed!")
     end, { desc = 'Manually refresh lualine theme' })
 
-    -- Store the last known background for change detection
-    local last_background = vim.o.background
-    
-    -- Create a timer to periodically check for background changes
-    local background_check_timer = vim.loop.new_timer()
-    background_check_timer:start(1000, 1000, function()
-      vim.schedule(function()
-        if vim.o.background ~= last_background then
-          last_background = vim.o.background
-          -- print("Detected background change to:", vim.o.background)
-          setup_lualine()
-          vim.cmd("redrawstatus")
-          -- print("Lualine refreshed via timer!")
-        end
-      end)
-    end)
   end,
 }
 

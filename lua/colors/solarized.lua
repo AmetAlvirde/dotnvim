@@ -3,6 +3,29 @@
 
 local M = {}
 
+local subscribers = {}
+
+function M.subscribe(fn)
+  table.insert(subscribers, fn)
+  local removed = false
+  return function()
+    if removed then return end
+    removed = true
+    for i, sub in ipairs(subscribers) do
+      if sub == fn then
+        table.remove(subscribers, i)
+        return
+      end
+    end
+  end
+end
+
+local function emit()
+  for _, sub in ipairs(subscribers) do
+    pcall(sub)
+  end
+end
+
 -- Color palette from the provided table
 local colors = {
   -- Base colors
@@ -491,7 +514,8 @@ function M.setup()
   
   -- Set colorscheme name
   vim.g.colors_name = "solarized"
-  
+  emit()
+
   -- Refresh lualine if it exists (for automatic OS theme changes)
   vim.defer_fn(function()
     if vim.fn.exists(':LualineRefresh') == 2 then
