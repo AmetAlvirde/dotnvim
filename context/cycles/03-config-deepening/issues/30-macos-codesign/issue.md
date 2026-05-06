@@ -9,56 +9,57 @@ contract (acceptance criteria, implementation approach, flags).
 
 ## Acceptance criteria
 
-- [ ] `lua/utils/macos_codesign/` exists as a subpackage directory
+- [x] `lua/utils/macos_codesign/` exists as a subpackage directory
       containing at minimum `command.lua`, `shell.lua`, and `init.lua`.
       Follows the ADR-0003 four-layer layout; parser and presenter layers
       are omitted (no output parsed; notifications are the utility's
       responsibility, not a presenter's).
-- [ ] `command.lua` exposes `M.resign_command(lazy_path: string) →
+- [x] `command.lua` exposes `M.resign_command(lazy_path: string) →
       string` — a pure function returning the `find … -exec codesign …`
       shell command string. No side effects. No `vim.*` dependencies.
       Verified by a unit test asserting the returned string for a known
       path.
-- [ ] `shell.lua` exposes `M.run(cmd: string)` and a setter seam
+- [x] `shell.lua` exposes `M.run(cmd: string)` and a setter seam
       (`M.set_runner(fn)` / `M.reset_runner()`) following the ADR-0003
       pattern. The default runner executes the command (synchronously,
       via the same mechanism as the current `io.popen`-based
       implementation). Tests substitute a fake runner to verify `run` is
       called with the expected command string.
-- [ ] `init.lua` exposes `M.resign_lazy_plugins()`:
+- [x] `init.lua` exposes `M.resign_lazy_plugins()`:
       1. Guards on `vim.fn.has("mac") == 1`; returns early on non-macOS.
       2. Derives `lazy_path` from `vim.fn.stdpath("data") .. "/lazy"`.
       3. Calls `command.resign_command(lazy_path)` to build the command.
       4. Emits an INFO `vim.notify` before running.
       5. Calls `shell.run(cmd)`.
       6. Emits an INFO `vim.notify` after running.
-- [ ] At least one unit test exists under `tests/utils/macos_codesign/`
+- [x] At least one unit test exists under `tests/utils/macos_codesign/`
       exercised by `./tests/run`. The test fakes the shell runner seam,
       calls `resign_lazy_plugins()` (with macOS guard satisfied), and
       asserts the runner was called with a command string containing
       `find`, `*.so`, and `codesign`.
-- [ ] The autocmd block in `lua/config/autocmds.lua` (lines 123–144)
+- [x] The autocmd block in `lua/config/autocmds.lua` (lines 123–144)
       is replaced with an unconditional `autocmd("User", { … })` whose
       callback is a one-line call:
       `require("utils.macos_codesign").resign_lazy_plugins()`.
       The `if vim.fn.has("mac") == 1 then … end` wrapper is removed from
       `autocmds.lua`; the guard lives inside `resign_lazy_plugins()`.
-- [ ] No edits to any other autocmd handler in `lua/config/autocmds.lua`.
+- [x] No edits to any other autocmd handler in `lua/config/autocmds.lua`.
       Verified by `git diff` showing changes only to the codesign block
       and nothing else in the file.
-- [ ] `./tests/run` exits 0 on the whole suite — including all cycle 01,
+- [x] `./tests/run` exits 0 on the whole suite — including all cycle 01,
       cycle 02, and cycle 03 (parent #22) specs.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
       suite passes with `codesign` and `obsidian` absent from `$PATH`).
-- [ ] No reaching into local functions or monkey-patching internals in
+- [x] No reaching into local functions or monkey-patching internals in
       the new specs. Carry-forward acceptance criterion from cycles 01–02
       and parent #22, still binding. The shell-runner setter seam is the
       only sanctioned substitution point.
-- [ ] **Resolved-through-implementation decision recorded:** whether the
+- [x] **Resolved-through-implementation decision recorded:** the
       `has("mac")` guard lives in `init.lua` (inside
-      `resign_lazy_plugins()`) or in the `autocmds.lua` autocmd
-      registration. Recorded in the closing sub-issue's AAR and in this
-      file with a one-sentence reason.
+      `resign_lazy_plugins()`), not in `autocmds.lua`. Reason: the
+      autocmd should be unconditional and declarative — the guard is
+      application logic that belongs in the utility, not in the wiring
+      file. See `aar.md`.
 
 ## Implementation approach
 
