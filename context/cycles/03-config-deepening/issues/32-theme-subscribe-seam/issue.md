@@ -9,37 +9,38 @@ approach, flags).
 
 ## Acceptance criteria
 
-- [ ] `lua/colors/solarized.lua` exposes `M.subscribe(fn) -> unsubscribe_fn`,
+- [x] `lua/colors/solarized.lua` exposes `M.subscribe(fn) -> unsubscribe_fn`,
       publicly `require`-able. Calling `subscribe` returns a callable that
       removes the registered subscriber from the registry. Calling the returned
-      callable twice is a no-op (idempotent).
-- [ ] `solarized.setup()` emits exactly once at the end of its body to every
+      callable twice is a no-op (idempotent). *(Done in #33.)*
+- [x] `solarized.setup()` emits exactly once at the end of its body to every
       registered subscriber. `set_theme()` and `toggle()` reach the emit through
       their existing call to `setup()`; they do not emit a second time. Verified
       by a unit test that registers a counting subscriber and asserts call count
-      = 1 per `set_theme(...)` invocation.
-- [ ] `lua/plugins/lualine.lua` calls `solarized.subscribe(fn)` exactly once in
+      = 1 per `set_theme(...)` invocation. *(FLAG-32-A resolved in #34; case 7
+      in `solarized_subscribe_spec.lua`.)*
+- [x] `lua/plugins/lualine.lua` calls `solarized.subscribe(fn)` exactly once in
       its `config` block, with `fn` being a closure that re-runs
       `setup_lualine()` and `redrawstatus`. The `vim.loop.new_timer()` polling
       timer is deleted. Verified by
       `grep -n 'vim\.loop\.new_timer' lua/plugins/lualine.lua` returning zero
-      matches.
-- [ ] The `OptionSet`/`background` autocmd and the `ColorScheme` autocmd in
+      matches. *(Done in #33.)*
+- [x] The `OptionSet`/`background` autocmd and the `ColorScheme` autocmd in
       `lua/plugins/lualine.lua` are deleted. All of lualine's theme-reaction
       goes through subscribe. Verified by
       `grep -n "nvim_create_autocmd" lua/plugins/lualine.lua` returning zero
-      matches.
-- [ ] The three `vim.defer_fn(... LualineRefresh ...)` blocks in
+      matches. *(Done in #34.)*
+- [x] The three `vim.defer_fn(... LualineRefresh ...)` blocks in
       `lua/colors/solarized.lua` (currently at lines ~496–500, ~519–526,
       ~539–544) are deleted. Subscribe replaces them. Verified by
       `grep -n 'LualineRefresh' lua/colors/solarized.lua` returning zero
-      matches.
-- [ ] All `print()` statements in the theme-change code paths are removed — both
+      matches. *(Done in #34.)*
+- [x] All `print()` statements in the theme-change code paths are removed — both
       the live debug calls in `solarized.lua` (lines ~511, ~520, ~524) and the
       live or commented `print(...)` lines in `lualine.lua`. Verified by
       `grep -rn '^\s*print(' lua/colors/ lua/plugins/lualine.lua` returning zero
       matches and `grep -rn '^\s*-- print(' lua/colors/ lua/plugins/lualine.lua`
-      returning zero matches in the theme paths.
+      returning zero matches in the theme paths. *(Done in #34.)*
 - [ ] `lua/colors/os_theme.lua` exists, exposing
       `M.detect() -> "dark" | "light"`. The module follows ADR-0003's
       runner-seam shape: a default runner that shells out via `io.popen`, plus
@@ -59,37 +60,41 @@ approach, flags).
       to detect system theme flips") or collapsed if subscribe + `os_theme`
       cache cover the observable behavior. Decision recorded in this parent's
       closing AAR. No other autocmd handler in `autocmds.lua` is touched.
-- [ ] At least one passing unit test exists under `tests/colors/` exercising the
+- [x] At least one passing unit test exists under `tests/colors/` exercising the
       subscribe contract: register a fake subscriber, call
       `solarized.set_theme("dark")` (with `vim.api.nvim_set_hl`, `vim.cmd`,
       `vim.defer_fn` stubbed via the established fake-the-API pattern), assert
       the fake was called once with the expected payload. The test also covers
       `unsubscribe_fn()` removing the subscriber and idempotent
-      double-unsubscribe.
+      double-unsubscribe. *(7 cases in `solarized_subscribe_spec.lua`; done in
+      #33 and extended in #34.)*
 - [ ] At least one passing unit test exists under `tests/colors/` exercising
       `os_theme.detect()`: a fake runner is installed via `set_runner`, a first
       call to `detect()` invokes the runner and returns the parsed theme, a
       second call returns the cached value without invoking the runner, and
       `M.refresh()` (or equivalent invalidation entry point) clears the cache.
-- [ ] `./tests/run` exits 0 on the whole suite — including all cycle 01, cycle
-      02, and cycle 03 (parents #22, #30) specs.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the suite passes
+- [x] `./tests/run` exits 0 on the whole suite — including all cycle 01, cycle
+      02, and cycle 03 (parents #22, #30) specs. *(125 cases passing after #34.)*
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the suite passes
       with `obsidian`, `codesign`, and `defaults` absent from `$PATH`). The
       `os_theme` runner-seam ensures the test never invokes the real `defaults`
-      binary.
-- [ ] No reaching into local functions or monkey-patching internals in any new
+      binary. *(Verified as `PATH=/opt/homebrew/bin:/usr/bin:/bin` after #34;
+      `vim.fn.has` stub routes around any shell-out.)*
+- [x] No reaching into local functions or monkey-patching internals in any new
       spec. Carry-forward acceptance criterion from cycles 01–02 and parents
       #22, #30, still binding. The two sanctioned substitution points are
       `os_theme.set_runner` and the per-test fakes for `vim.api.nvim_set_hl`,
       `vim.cmd`, `vim.defer_fn` (the pattern parents #22 and #30 established).
-- [ ] **Resolved-through-implementation decision recorded:** subscribe registry
+      *(Upheld in #33 and #34.)*
+- [x] **Resolved-through-implementation decision recorded:** subscribe registry
       location — module-local table inside `solarized.lua`, or extracted to
       `lua/colors/subscribe.lua`. Decided in first sub-issue (#33) and recorded
       in its AAR. Default expectation: module-local, per cycle PRD open question
-      #3's caution against premature generalization.
-- [ ] **Resolved-through-implementation decision recorded:** subscribe payload
+      #3's caution against premature generalization. *(Alt. A: module-local.)*
+- [x] **Resolved-through-implementation decision recorded:** subscribe payload
       shape — `fn()` (no-arg, subscriber pulls `vim.o.background`) vs
       `fn(theme)` vs `fn(payload_table)`. Decided in first sub-issue (#33).
+      *(C1: no-arg.)*
 - [ ] **Resolved-through-implementation decision recorded:** subscribe
       generalization (cycle PRD open question #3). Default expectation after
       this parent closes: scope strictly to `colors.solarized.subscribe`; no
@@ -331,10 +336,10 @@ mid-test and the re-apply path is never triggered.
 redundant `redrawstatus`. Functionally harmless today (idempotent re-draw),
 but contradicts the "emit exactly once per `setup()` call" contract in spirit.
 
-**Proposed resolution for #34:** When sub-issue #34 deletes the `OptionSet`
-and `ColorScheme` autocmds, confirm whether the `colors/solarized.lua` re-apply
-path is the only remaining duplicate-emit source. If so, an option is to move
-`vim.o.background = theme` inside `set_theme` to _after_ `M.setup()` returns
-(background is already set by `setup()` via `get_os_theme()`, so the explicit
-pre-set in `set_theme` is redundant). That removes the re-apply trigger without
-changing any AC. Decision deferred to #34's implementation pass.
+**Resolved in #34: Alternative A.** `set_theme` and `toggle` clear
+`vim.g.colors_name = nil` before calling `M.setup(theme_override)`, suppressing
+Neovim's colorscheme-reapply path. `M.setup` gained an optional `theme_override`
+argument so the caller's choice wins over `get_os_theme()`. Verified by spec
+case 7 (`set_theme: emits exactly once when background flips` in
+`tests/colors/solarized_subscribe_spec.lua`). The latent "user choice loses to OS
+state" bug in `set_theme` is fixed as a side effect of the override arg.

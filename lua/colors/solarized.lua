@@ -122,8 +122,8 @@ local light_colors = {
 M.light_colors = light_colors
 
 -- Function to apply colorscheme
-function M.setup()
-  local theme = get_os_theme()
+function M.setup(theme_override)
+  local theme = theme_override or get_os_theme()
   local c = theme == "dark" and dark_colors or light_colors
   
   -- Set background
@@ -515,56 +515,26 @@ function M.setup()
   -- Set colorscheme name
   vim.g.colors_name = "solarized"
   emit()
-
-  -- Refresh lualine if it exists (for automatic OS theme changes)
-  vim.defer_fn(function()
-    if vim.fn.exists(':LualineRefresh') == 2 then
-      vim.cmd("LualineRefresh")
-    end
-  end, 200)
 end
 
 -- Function to toggle theme
 function M.toggle()
-  local old_bg = vim.o.background
-  if vim.o.background == "dark" then
-    vim.o.background = "light"
-  else
-    vim.o.background = "dark"
-  end
-  print("Solarized: Toggling from", old_bg, "to", vim.o.background)
-  
-  M.setup()
-  
-  -- Trigger a redraw to ensure all plugins update
+  local next = vim.o.background == "dark" and "light" or "dark"
+  -- Clear colors_name before background change to suppress Neovim's
+  -- colorscheme-reapply path (FLAG-32-A); setup() re-asserts it at its end.
+  vim.g.colors_name = nil
+  M.setup(next)
   vim.cmd("redraw!")
-  
-  -- Explicitly refresh lualine if it exists
-  vim.defer_fn(function()
-    if vim.fn.exists(':LualineRefresh') == 2 then
-      print("Solarized: Manually refreshing lualine...")
-      vim.cmd("LualineRefresh")
-    else
-      print("Solarized: LualineRefresh command not found")
-    end
-  end, 150)
 end
 
 -- Function to set specific theme
 function M.set_theme(theme)
   if theme == "dark" or theme == "light" then
-    vim.o.background = theme
-    M.setup()
-    
-    -- Trigger a redraw to ensure all plugins update
+    -- Clear colors_name before setup to suppress Neovim's colorscheme-reapply
+    -- path when background direction changes (FLAG-32-A); setup() re-asserts it.
+    vim.g.colors_name = nil
+    M.setup(theme)
     vim.cmd("redraw!")
-    
-    -- Explicitly refresh lualine if it exists
-    vim.defer_fn(function()
-      if vim.fn.exists(':LualineRefresh') == 2 then
-        vim.cmd("LualineRefresh")
-      end
-    end, 150)
   end
 end
 

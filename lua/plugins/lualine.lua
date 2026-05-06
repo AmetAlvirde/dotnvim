@@ -132,42 +132,11 @@ return {
       end, 100)
     end)
 
-    -- Create autocmd to refresh lualine when background changes
-    vim.api.nvim_create_autocmd('OptionSet', {
-      pattern = 'background',
-      callback = function()
-        -- print("Background option changed to:", vim.o.background)
-        -- Small delay to ensure colorscheme is fully applied
-        vim.defer_fn(function()
-          setup_lualine()
-          -- Force a redraw to ensure the statusline updates
-          vim.cmd("redrawstatus")
-          -- print("Lualine refreshed automatically!")
-        end, 100)
-      end,
-      desc = 'Refresh lualine theme when background changes'
-    })
-
-    -- Alternative: Create autocmd for ColorScheme event
-    vim.api.nvim_create_autocmd('ColorScheme', {
-      pattern = '*',
-      callback = function()
-        print("ColorScheme changed to:", vim.g.colors_name)
-        vim.defer_fn(function()
-          setup_lualine()
-          vim.cmd("redrawstatus")
-          -- print("Lualine refreshed via ColorScheme event!")
-        end, 100)
-      end,
-      desc = 'Refresh lualine theme when colorscheme changes'
-    })
-
     -- Plugin-internal user command (out of commands.register's contract);
     -- see context/cycles/03-config-deepening/issues/22-commands-registrar/issue.md.
     vim.api.nvim_create_user_command('LualineRefresh', function()
       setup_lualine()
       vim.cmd("redrawstatus")
-      -- print("Lualine theme refreshed!")
     end, { desc = 'Manually refresh lualine theme' })
 
   end,

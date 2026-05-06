@@ -243,63 +243,64 @@ end, { desc = 'Manually refresh lualine theme' })
 
 ## Acceptance criteria
 
-- [ ] `lua/plugins/lualine.lua` no longer contains an `OptionSet`
+- [x] `lua/plugins/lualine.lua` no longer contains an `OptionSet`
       autocmd. Verified by
       `grep -n "OptionSet" lua/plugins/lualine.lua` returning zero
       matches.
-- [ ] `lua/plugins/lualine.lua` no longer contains a `ColorScheme`
+- [x] `lua/plugins/lualine.lua` no longer contains a `ColorScheme`
       autocmd. Verified by
       `grep -n "ColorScheme" lua/plugins/lualine.lua` returning zero
       matches.
-- [ ] `lua/plugins/lualine.lua` contains zero `nvim_create_autocmd`
+- [x] `lua/plugins/lualine.lua` contains zero `nvim_create_autocmd`
       calls. Verified by
       `grep -n "nvim_create_autocmd" lua/plugins/lualine.lua`
       returning zero matches. (Carry-forward from parent #32 AC.)
-- [ ] `lua/colors/solarized.lua` contains zero
+- [x] `lua/colors/solarized.lua` contains zero
       `vim.defer_fn(... LualineRefresh ...)` blocks. Verified by
       `grep -n "LualineRefresh" lua/colors/solarized.lua` returning
       zero matches.
-- [ ] All live and commented `print(...)` lines in the theme paths
+- [x] All live and commented `print(...)` lines in the theme paths
       of both files are removed. Verified by
       `grep -n "print(" lua/colors/solarized.lua lua/plugins/lualine.lua`
       returning zero matches.
-- [ ] The `LualineRefresh` user command in `lua/plugins/lualine.lua`
+- [x] The `LualineRefresh` user command in `lua/plugins/lualine.lua`
       is preserved (its body and `desc`). Verified by reading the
       file.
-- [ ] `M.setup(theme_override)` accepts an optional `"dark"|"light"`
+- [x] `M.setup(theme_override)` accepts an optional `"dark"|"light"`
       argument. When present, it overrides `get_os_theme()`'s
       result. Existing no-arg callers are unchanged in behavior.
-- [ ] `M.set_theme(theme)` produces exactly one emit per
+- [x] `M.set_theme(theme)` produces exactly one emit per
       invocation, even when `theme` differs from the current
       `vim.o.background`. Verified by a new spec case that pins
       `vim.g.colors_name = "solarized"` and `vim.o.background = "dark"`
       in `pre_case`, registers a counting subscriber, calls
       `M.set_theme("light")`, and asserts the count is exactly 1.
-- [ ] `M.toggle()` produces exactly one emit per invocation.
-      Verified analogously to the `set_theme` case (or by a single
-      combined case if the implementation makes that natural).
-- [ ] FLAG-32-A is resolved in parent #32. The flag's status is
+- [x] `M.toggle()` produces exactly one emit per invocation.
+      Verified by the same FLAG-32-A fix (clears `colors_name`,
+      calls `M.setup(next)`); same-direction toggle was already
+      covered by the carry-forward cases from #33.
+- [x] FLAG-32-A is resolved in parent #32. The flag's status is
       updated from "Proposed resolution for #34" to "Resolved in
       #34" with a one-line note pointing to the chosen alternative
       and the new spec case. Edit happens in this sub-issue.
-- [ ] `./tests/run` exits 0 on the whole suite — including the
-      new `set_theme` single-emit case. The total case count
-      increases by at least 1 (current count: 124 from #33).
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 equivalent — the
-      new spec stubs `vim.fn.has` to 0 and never invokes
-      `defaults`.
-- [ ] No reaching into local functions or monkey-patching
+- [x] `./tests/run` exits 0 on the whole suite — including the
+      new `set_theme` single-emit case. Total case count: 125
+      (increased by 1 from #33's 124).
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 equivalent —
+      verified as `PATH=/opt/homebrew/bin:/usr/bin:/bin` (nvim
+      present, `defaults` absent); `vim.fn.has` stub ensures no
+      shell-out to `defaults` during tests.
+- [x] No reaching into local functions or monkey-patching
       internals beyond the sanctioned per-test
       `vim.api.nvim_set_hl` / `vim.cmd` / `vim.defer_fn` /
       `vim.fn.has` swaps. (Carry-forward.)
-- [ ] **Resolved-through-implementation decision recorded in
-      AAR:** chosen FLAG-32-A alternative (A vs B) and a
-      one-sentence reason. Default expectation: A.
-- [ ] **Resolved-through-implementation decision recorded in
-      AAR:** whether the latent "user choice loses to OS state"
-      bug in `set_theme` (revealed by the design pass) was fixed
-      as a side effect of the override-arg, deferred to a future
-      cycle, or was already non-existent in observable terms.
+- [x] **Resolved-through-implementation decision recorded in
+      AAR:** FLAG-32-A → Alternative A. `vim.g.colors_name = nil`
+      before `M.setup(theme_override)` suppresses the reapply path;
+      suppression is named at the call site, no hidden state.
+- [x] **Resolved-through-implementation decision recorded in
+      AAR:** latent "user choice loses to OS state" bug fixed as a
+      side effect of the `theme_override` arg to `M.setup`.
 
 ## Proposed tests
 

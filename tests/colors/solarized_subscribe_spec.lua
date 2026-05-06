@@ -123,4 +123,26 @@ T["subscribe: one erroring subscriber does not block subsequent ones"] = functio
   MiniTest.expect.equality(reached, true)
 end
 
+-- Case 7 — FLAG-32-A resolution: exactly one emit when background flips.
+-- Without the fix, set_theme("light") while colors_name="solarized" and
+-- background="dark" fires two setup() calls (colorscheme-reapply + explicit),
+-- producing count=2. Alternative A (clear colors_name before setup) must
+-- yield count=1.
+T["set_theme: emits exactly once when background flips"] = function()
+  -- pre_case pins vim.o.background = "dark"; set colors_name to simulate
+  -- production state where the solarized colorscheme is already active.
+  vim.g.colors_name = "solarized"
+
+  local solarized = require("colors.solarized")
+
+  local count = 0
+  solarized.subscribe(function() count = count + 1 end)
+
+  solarized.set_theme("light")
+
+  MiniTest.expect.equality(count, 1)
+  -- setup() re-asserts colors_name at its end; confirm it is back.
+  MiniTest.expect.equality(vim.g.colors_name, "solarized")
+end
+
 return T
