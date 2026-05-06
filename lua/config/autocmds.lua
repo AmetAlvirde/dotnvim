@@ -120,25 +120,11 @@ autocmd("FocusGained", {
   group = solarized_group,
 })
 
--- macOS 26+ (Tahoe) enforces stricter code signature validation for .so files
--- loaded via dlopen. Ad-hoc signatures on compiled plugin binaries get rejected
--- unless explicitly re-signed. Re-sign all .so files after lazy plugin changes.
-if vim.fn.has("mac") == 1 then
-  autocmd("User", {
-    pattern = { "LazyInstall", "LazyUpdate", "LazySync", "LazyBuild" },
-    callback = function()
-      vim.notify("Re-signing plugin .so files for macOS compatibility...", vim.log.levels.INFO)
-      local lazy_path = vim.fn.stdpath("data") .. "/lazy"
-      local handle = io.popen(
-        string.format(
-          "find %s -name '*.so' -exec codesign -f -s - {} \\; 2>&1",
-          lazy_path
-        )
-      )
-      if handle then
-        handle:close()
-      end
-      vim.notify("Done re-signing .so files.", vim.log.levels.INFO)
-    end,
-  })
-end
+-- macOS 26+ (Tahoe): re-sign .so files after lazy plugin changes.
+autocmd("User", {
+  pattern = { "LazyInstall", "LazyUpdate", "LazySync", "LazyBuild" },
+  callback = function()
+    require("utils.macos_codesign").resign_lazy_plugins()
+  end,
+  desc = "Re-sign plugin .so files for macOS compatibility after Lazy updates",
+})
