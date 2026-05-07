@@ -102,6 +102,8 @@ local solarized_group = augroup("SolarizedTheme", { clear = true })
 
 -- Auto-detect and apply theme on startup
 autocmd("VimEnter", {
+  desc = "Re-apply solarized after lazy.nvim plugin load so subscribers "
+      .. "(lualine) registered post-colorscheme receive the startup emit.",
   callback = function()
     if vim.g.colors_name == "solarized" then
       require("colors.solarized").setup()
@@ -112,8 +114,11 @@ autocmd("VimEnter", {
 
 -- Auto-detect theme changes (for macOS and Linux)
 autocmd("FocusGained", {
+  desc = "Refresh os_theme cache and re-apply solarized so a system "
+      .. "theme flip while nvim was unfocused is detected on focus return.",
   callback = function()
     if vim.g.colors_name == "solarized" then
+      require("colors.os_theme").refresh()
       require("colors.solarized").setup()
     end
   end,

@@ -1,7 +1,32 @@
 -- Custom Solarized theme with automatic dark/light mode switching
 -- Based on the provided color palette with OKLCH values
 
+local os_theme = require("colors.os_theme")
+
 local M = {}
+
+local subscribers = {}
+
+function M.subscribe(fn)
+  table.insert(subscribers, fn)
+  local removed = false
+  return function()
+    if removed then return end
+    removed = true
+    for i, sub in ipairs(subscribers) do
+      if sub == fn then
+        table.remove(subscribers, i)
+        return
+      end
+    end
+  end
+end
+
+local function emit()
+  for _, sub in ipairs(subscribers) do
+    pcall(sub)
+  end
+end
 
 -- Color palette from the provided table
 local colors = {
@@ -27,30 +52,6 @@ local colors = {
 }
 
 M.colors = colors
-
--- Function to detect OS theme
-local function get_os_theme()
-  if vim.fn.has("mac") == 1 then
-    -- On macOS, check the system appearance
-    local handle = io.popen("defaults read -g AppleInterfaceStyle 2>/dev/null")
-    if handle then
-      local result = handle:read("*a")
-      handle:close()
-      return result:match("Dark") and "dark" or "light"
-    end
-  elseif vim.fn.has("unix") == 1 then
-    -- On Linux, check gsettings or environment
-    local handle = io.popen("gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null")
-    if handle then
-      local result = handle:read("*a")
-      handle:close()
-      return result:match("Dark") and "dark" or "light"
-    end
-  end
-  
-  -- Fallback: check if background is set to dark
-  return vim.o.background == "dark" and "dark" or "light"
-end
 
 -- Dark theme colors
 local dark_colors = {
@@ -99,8 +100,8 @@ local light_colors = {
 M.light_colors = light_colors
 
 -- Function to apply colorscheme
-function M.setup()
-  local theme = get_os_theme()
+function M.setup(theme_override)
+  local theme = theme_override or os_theme.detect()
   local c = theme == "dark" and dark_colors or light_colors
   
   -- Set background
@@ -491,56 +492,27 @@ function M.setup()
   
   -- Set colorscheme name
   vim.g.colors_name = "solarized"
-  
-  -- Refresh lualine if it exists (for automatic OS theme changes)
-  vim.defer_fn(function()
-    if vim.fn.exists(':LualineRefresh') == 2 then
-      vim.cmd("LualineRefresh")
-    end
-  end, 200)
+  emit()
 end
 
 -- Function to toggle theme
 function M.toggle()
-  local old_bg = vim.o.background
-  if vim.o.background == "dark" then
-    vim.o.background = "light"
-  else
-    vim.o.background = "dark"
-  end
-  print("Solarized: Toggling from", old_bg, "to", vim.o.background)
-  
-  M.setup()
-  
-  -- Trigger a redraw to ensure all plugins update
+  local next = vim.o.background == "dark" and "light" or "dark"
+  -- Clear colors_name before background change to suppress Neovim's
+  -- colorscheme-reapply path (FLAG-32-A); setup() re-asserts it at its end.
+  vim.g.colors_name = nil
+  M.setup(next)
   vim.cmd("redraw!")
-  
-  -- Explicitly refresh lualine if it exists
-  vim.defer_fn(function()
-    if vim.fn.exists(':LualineRefresh') == 2 then
-      print("Solarized: Manually refreshing lualine...")
-      vim.cmd("LualineRefresh")
-    else
-      print("Solarized: LualineRefresh command not found")
-    end
-  end, 150)
 end
 
 -- Function to set specific theme
 function M.set_theme(theme)
   if theme == "dark" or theme == "light" then
-    vim.o.background = theme
-    M.setup()
-    
-    -- Trigger a redraw to ensure all plugins update
+    -- Clear colors_name before setup to suppress Neovim's colorscheme-reapply
+    -- path when background direction changes (FLAG-32-A); setup() re-asserts it.
+    vim.g.colors_name = nil
+    M.setup(theme)
     vim.cmd("redraw!")
-    
-    -- Explicitly refresh lualine if it exists
-    vim.defer_fn(function()
-      if vim.fn.exists(':LualineRefresh') == 2 then
-        vim.cmd("LualineRefresh")
-      end
-    end, 150)
   end
 end
 
