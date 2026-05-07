@@ -1,6 +1,8 @@
 -- Custom Solarized theme with automatic dark/light mode switching
 -- Based on the provided color palette with OKLCH values
 
+local os_theme = require("colors.os_theme")
+
 local M = {}
 
 local subscribers = {}
@@ -51,30 +53,6 @@ local colors = {
 
 M.colors = colors
 
--- Function to detect OS theme
-local function get_os_theme()
-  if vim.fn.has("mac") == 1 then
-    -- On macOS, check the system appearance
-    local handle = io.popen("defaults read -g AppleInterfaceStyle 2>/dev/null")
-    if handle then
-      local result = handle:read("*a")
-      handle:close()
-      return result:match("Dark") and "dark" or "light"
-    end
-  elseif vim.fn.has("unix") == 1 then
-    -- On Linux, check gsettings or environment
-    local handle = io.popen("gsettings get org.gnome.desktop.interface gtk-theme 2>/dev/null")
-    if handle then
-      local result = handle:read("*a")
-      handle:close()
-      return result:match("Dark") and "dark" or "light"
-    end
-  end
-  
-  -- Fallback: check if background is set to dark
-  return vim.o.background == "dark" and "dark" or "light"
-end
-
 -- Dark theme colors
 local dark_colors = {
   bg0 = colors.base03,
@@ -123,7 +101,7 @@ M.light_colors = light_colors
 
 -- Function to apply colorscheme
 function M.setup(theme_override)
-  local theme = theme_override or get_os_theme()
+  local theme = theme_override or os_theme.detect()
   local c = theme == "dark" and dark_colors or light_colors
   
   -- Set background

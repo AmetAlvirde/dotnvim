@@ -41,19 +41,17 @@ approach, flags).
       `grep -rn '^\s*print(' lua/colors/ lua/plugins/lualine.lua` returning zero
       matches and `grep -rn '^\s*-- print(' lua/colors/ lua/plugins/lualine.lua`
       returning zero matches in the theme paths. *(Done in #34.)*
-- [ ] `lua/colors/os_theme.lua` exists, exposing
+- [x] `lua/colors/os_theme.lua` exists, exposing
       `M.detect() -> "dark" | "light"`. The module follows ADR-0003's
       runner-seam shape: a default runner that shells out via `io.popen`, plus
       `M.set_runner(fn)` and `M.reset_runner()` setters. The
       `defaults read AppleInterfaceStyle` shell-out fires only on cache miss or
       after `M.refresh()` is called — not on every invocation of `M.detect()`.
-      Whether the module collapses runner+command into one file or splits per
-      ADR-0003's four-layer pattern (`command.lua`, `shell.lua`) is resolved
-      through implementation in this parent's first sub-issue and recorded in
-      its AAR.
-- [ ] `solarized.setup()` calls `require("colors.os_theme").detect()` instead of
+      Collapse vs split resolved in #35 (Alternative C — single file, runner
+      takes `cmd`). *(Done in #35.)*
+- [x] `solarized.setup()` calls `require("colors.os_theme").detect()` instead of
       the currently-inlined `get_os_theme` local function. The local
-      `get_os_theme` is removed from `solarized.lua`.
+      `get_os_theme` is removed from `solarized.lua`. *(Done in #35.)*
 - [ ] The `VimEnter` and `FocusGained` solarized autocmds in
       `lua/config/autocmds.lua` are addressed: either retained with a one-line
       `desc` recording the reason (e.g. "trigger `os_theme.refresh()` on focus
@@ -68,11 +66,12 @@ approach, flags).
       `unsubscribe_fn()` removing the subscriber and idempotent
       double-unsubscribe. *(7 cases in `solarized_subscribe_spec.lua`; done in
       #33 and extended in #34.)*
-- [ ] At least one passing unit test exists under `tests/colors/` exercising
+- [x] At least one passing unit test exists under `tests/colors/` exercising
       `os_theme.detect()`: a fake runner is installed via `set_runner`, a first
       call to `detect()` invokes the runner and returns the parsed theme, a
       second call returns the cached value without invoking the runner, and
-      `M.refresh()` (or equivalent invalidation entry point) clears the cache.
+      `M.refresh()` clears the cache. 7 cases in `os_theme_spec.lua`.
+      *(Done in #35.)*
 - [x] `./tests/run` exits 0 on the whole suite — including all cycle 01, cycle
       02, and cycle 03 (parents #22, #30) specs. *(125 cases passing after #34.)*
 - [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the suite passes

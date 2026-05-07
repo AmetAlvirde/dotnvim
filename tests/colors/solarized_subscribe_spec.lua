@@ -8,8 +8,10 @@ local _orig_fn_has    = vim.fn.has
 local T = MiniTest.new_set({
   hooks = {
     pre_case = function()
-      -- Force a fresh module load so subscriber state doesn't leak between cases.
+      -- Force a fresh module load so subscriber state and os_theme cache don't
+      -- leak between cases.
       package.loaded["colors.solarized"] = nil
+      package.loaded["colors.os_theme"]  = nil
 
       -- Stub Neovim API calls that solarized.setup() makes internally.
       vim.api.nvim_set_hl = function() end
@@ -32,6 +34,7 @@ local T = MiniTest.new_set({
       vim.defer_fn        = _orig_defer_fn
       vim.fn.has          = _orig_fn_has
       package.loaded["colors.solarized"] = nil
+      package.loaded["colors.os_theme"]  = nil
     end,
   },
 })
