@@ -99,16 +99,27 @@ local light_colors = {
 
 M.light_colors = light_colors
 
+local SECTIONS = {
+  "colors.highlights.lsp_diagnostic",
+}
+
 -- Function to apply colorscheme
 function M.setup(theme_override)
   local theme = theme_override or os_theme.detect()
   local c = theme == "dark" and dark_colors or light_colors
-  
+
   -- Set background
   vim.o.background = theme
-  
-  -- Define highlight groups
-  local highlights = {
+
+  local merged = {}
+  for _, mod in ipairs(SECTIONS) do
+    for group, opts in pairs(require(mod).highlights(c)) do
+      merged[group] = opts
+    end
+  end
+
+  -- Intermediate inlined table (shrinks as sections are extracted):
+  local rest = {
     -- Basic colors
     Normal = { fg = c.fg0, bg = c.bg0 },
     NormalFloat = { fg = c.fg0, bg = c.bg1 },
@@ -220,17 +231,6 @@ function M.setup(theme_override)
     Bold = { bold = true },
     Italic = { italic = true },
     
-    -- LSP
-    LspReferenceText = { bg = c.bg2 },
-    LspReferenceRead = { bg = c.bg2 },
-    LspReferenceWrite = { bg = c.bg2 },
-    
-    -- Diagnostic
-    DiagnosticError = { fg = c.red },
-    DiagnosticWarn = { fg = c.yellow },
-    DiagnosticInfo = { fg = c.blue },
-    DiagnosticHint = { fg = c.cyan },
-
     -- HTML Template Literals
     javaScriptStringT = { fg = c.yellow },
     htmlTag = { fg = c.magenta },
@@ -453,9 +453,11 @@ function M.setup(theme_override)
     markdownCallout = { fg = c.blue, bg = c.bg1 },
     markdownCalloutTitle = { fg = c.blue, bold = true },
   }
-  
-  -- Apply highlights
-  for group, opts in pairs(highlights) do
+  for group, opts in pairs(rest) do
+    merged[group] = opts
+  end
+
+  for group, opts in pairs(merged) do
     vim.api.nvim_set_hl(0, group, opts)
   end
 
