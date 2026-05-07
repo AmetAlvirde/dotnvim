@@ -10,7 +10,7 @@ implementation approach, flags).
 
 ## Acceptance criteria
 
-- [ ] `lua/colors/highlights/` exists as a directory of section
+- [x] `lua/colors/highlights/` exists as a directory of section
       modules. Each module is publicly `require`-able as
       `require("colors.highlights.<section>")` and exposes
       `M.highlights(c) → table` as a pure function — no `vim.*`
@@ -18,7 +18,7 @@ implementation approach, flags).
       beyond `local M = {}`. Verified by
       `grep -rn 'vim\.' lua/colors/highlights/` returning zero
       matches.
-- [ ] `lua/colors/solarized.lua`'s `setup()` body no longer contains
+- [x] `lua/colors/solarized.lua`'s `setup()` body no longer contains
       a single inline highlight table that enumerates the full set
       of groups. The literal table currently spanning lines ~111–455
       is gone; `setup()` requires the section modules, calls
@@ -26,7 +26,7 @@ implementation approach, flags).
       `vim.api.nvim_set_hl` loop. Structural-intent AC; verified by
       reading the post-cycle `setup()` body against the pre-cycle
       `git show` output.
-- [ ] The trailing manual `vim.api.nvim_set_hl` calls currently at
+- [x] The trailing manual `vim.api.nvim_set_hl` calls currently at
       lines ~462–491 of `solarized.lua` are folded into the
       appropriate section modules. After C, `setup()` has exactly
       one `for group, opts in pairs(merged) do
@@ -34,7 +34,7 @@ implementation approach, flags).
       additional `vim.api.nvim_set_hl` calls. Verified by
       `grep -n 'nvim_set_hl' lua/colors/solarized.lua` returning
       exactly one match.
-- [ ] Each section module under `lua/colors/highlights/` has at
+- [x] Each section module under `lua/colors/highlights/` has at
       least one passing unit test under
       `tests/colors/highlights/<section>_spec.lua` exercising
       `M.highlights(c)` as a pure function: pass a representative
@@ -42,7 +42,7 @@ implementation approach, flags).
       groups with the expected attributes for at least one entry
       per visual concern the section covers (e.g., a heading entry
       and a code entry for the markdown section).
-- [ ] At least one composition-level spec exists at
+- [x] At least one composition-level spec exists at
       `tests/colors/solarized_composition_spec.lua` (or equivalent)
       exercising `solarized.setup()` end-to-end: stub
       `vim.api.nvim_set_hl` to record `(group, opts)`, call
@@ -51,13 +51,13 @@ implementation approach, flags).
       template-literals / markdown override pairs in their
       expected final-write form. The subset asserted is the closure
       signal per cycle PRD constraint #6.
-- [ ] Highlight output is preserved across the reshape. The set of
+- [x] Highlight output is preserved across the reshape. The set of
       groups recorded by the composition spec under `setup("dark")`
       and `setup("light")` matches — with respect to the asserted
       subset — the set of groups produced by the pre-cycle
       `setup()` on the same palette. No group is dropped, no
       attribute set is silently changed, no group is added.
-- [ ] No edits to `lua/colors/os_theme.lua`, `lua/config/autocmds.lua`,
+- [x] No edits to `lua/colors/os_theme.lua`, `lua/config/autocmds.lua`,
       `lua/plugins/lualine.lua`, `lua/config/commands.lua`,
       `lua/config/commands_registrar.lua`, `lua/utils/obsidian_cli/`,
       `lua/utils/wordcount.lua`, or `lua/utils/macos_codesign/`.
@@ -65,7 +65,7 @@ implementation approach, flags).
       only under `lua/colors/solarized.lua`,
       `lua/colors/highlights/`, and `tests/colors/highlights/`
       (plus the composition spec).
-- [ ] The palette tables in `solarized.lua` (`colors`, `dark_colors`,
+- [x] The palette tables in `solarized.lua` (`colors`, `dark_colors`,
       `light_colors`) are byte-for-byte unchanged from the pre-cycle
       base. The public surface (`M.setup`, `M.set_theme`, `M.toggle`,
       `M.subscribe`, `M.colors`, `M.dark_colors`, `M.light_colors`)
@@ -73,28 +73,28 @@ implementation approach, flags).
       `subscribe`/`emit` registry, the `os_theme.detect()` call site,
       the `vim.g.colors_name = nil` clear in `set_theme`/`toggle`,
       and the single `emit()` at the end of `setup()` are preserved.
-- [ ] `./tests/run` exits 0 on the whole suite — including all cycle
+- [x] `./tests/run` exits 0 on the whole suite — including all cycle
       01, cycle 02, and cycle 03 (parents #22, #30, #32) specs.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 (or equivalent — the
       suite passes with `obsidian`, `codesign`, and `defaults`
       absent from `$PATH`). Section-module specs do not depend on
       any external binary; the composition spec inherits parent
       #32's `vim.fn.has` stub pattern to keep `os_theme` from
       shelling out.
-- [ ] No reaching into local functions or monkey-patching internals
+- [x] No reaching into local functions or monkey-patching internals
       in any new spec. Carry-forward acceptance criterion from
       cycles 01–02 and parents #22, #30, #32, still binding.
       Section modules are tested through `M.highlights(c)`; the
       composition spec is tested through `solarized.setup()` with
       the same per-test `vim.api.nvim_set_hl` / `vim.cmd` /
       `vim.defer_fn` / `vim.fn.has` swaps the parents established.
-- [ ] **Resolved-through-implementation decision recorded:** final
+- [x] **Resolved-through-implementation decision recorded:** final
       section partition (names, count, membership of each section
       module). Decided in the first sub-issue and recorded in its
       AAR. The starting partition in `sub-prd.md` ("Scope" section)
       is the proposed default; deviations require a one-sentence
       reason in the AAR.
-- [ ] **Resolved-through-implementation decision recorded:** merge
+- [x] **Resolved-through-implementation decision recorded:** merge
       order and override semantics — last-module-wins vs.
       no-shared-keys. Decided in the first sub-issue. Default
       expectation: last-module-wins for the
@@ -102,14 +102,14 @@ implementation approach, flags).
       that preserves current observable output without forcing a
       single augmented section module to absorb both sides of
       the override.
-- [ ] **Resolved-through-implementation decision recorded:**
+- [x] **Resolved-through-implementation decision recorded:**
       composition-test depth (cycle PRD open question #5) —
       representative subset vs. full-table snapshot. Decided
       during the closing sub-issue. Default expectation: a
       representative-subset spec is sufficient unless
       implementation surfaces a composition-order regression the
       subset missed.
-- [ ] **Resolved-through-implementation decision recorded:**
+- [x] **Resolved-through-implementation decision recorded:**
       whether C generates a flag for the cycle 03 PRD close's
       ADR-0004 evaluation (parent #32 open Q #4). The
       section-module pattern is structurally distinct from the

@@ -275,6 +275,12 @@ point evaluate whether registrar (#22) + subscribe (#33) + os_theme runner
 (#35) form a coherent "module-local seam with public setter" family warranting
 ADR-0004. Recorded in `issues/32-theme-subscribe-seam/aar.md`.
 
+**Resolution (cycle 03 PRD close):** Do not open ADR-0004 in cycle 03. The
+evidence across #22/#32/#38 supports shared intent, but not yet a single
+stable pattern with clear enough boundaries and consequences to codify without
+overfitting. Carry forward as a future-cycle candidate only if additional
+modules converge on the same seam shape.
+
 ### 5. Highlight-section testing depth in C — `RESOLVE THROUGH IMPLEMENTATION`
 
 Each section's `highlights(c) → table` is unit-testable as a pure function
@@ -283,6 +289,11 @@ the _composed_ output of `setup()` matches a stable snapshot, or to stop at
 per-section tests, is a sub-issue call during C. The risk is that per-section
 tests pass while the composition order regresses; a snapshot test catches that
 but is churnier to maintain.
+
+**Resolution (parent #38 / #42):** Representative-subset composition checks are
+sufficient; full-table snapshot deferred. No regression surfaced in #39-#41
+that escaped the subset probes, and snapshot churn was not justified by
+observed detection benefit.
 
 ### 6. Candidate F as its own parent? — RESOLVED → no, fold or skip
 

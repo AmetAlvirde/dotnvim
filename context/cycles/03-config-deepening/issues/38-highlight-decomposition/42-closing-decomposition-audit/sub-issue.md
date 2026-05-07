@@ -190,36 +190,36 @@ blocks closure until resolved.
 
 ## Acceptance criteria
 
-- [ ] All fifteen audit rows above run; outcomes recorded in this
+- [x] All fifteen audit rows above run; outcomes recorded in this
       sub-issue's AAR. Every row passes (✓) or carries an explicit
       flag explaining the deviation.
-- [ ] Cycle PRD open question #5 (composition-test depth) is
+- [x] Cycle PRD open question #5 (composition-test depth) is
       resolved in this sub-issue's AAR with the reasoning. Default
       expectation: representative-subset confirmed sufficient,
       promotion to full-table snapshot deferred (per #41 AAR — no
       composition-order regression was missed by the subset).
-- [ ] ADR-0004 carry-forward note is recorded in this sub-issue's
+- [x] ADR-0004 carry-forward note is recorded in this sub-issue's
       AAR for the cycle 03 PRD-close pass. The note states whether
       the section-module pattern joins ADR-0004 or warrants its own
       ADR — without making the call here. The PRD-close pass is
       the right scope for that comparison.
-- [ ] Parent #38's sibling `aar.md` lands at
+- [x] Parent #38's sibling `aar.md` lands at
       `context/cycles/03-config-deepening/issues/38-highlight-decomposition/aar.md`.
       It records the four-sub-issue arc (#39 → #40 → #41 → #42),
       summarizes the carry-forward from each sub-issue's AAR,
       confirms parent #38's flags list closes empty, and surfaces
       any cross-cutting carry-forward into the cycle 03 PRD close.
-- [ ] No source changes under `lua/colors/`, `lua/config/`,
+- [x] No source changes under `lua/colors/`, `lua/config/`,
       `lua/plugins/`, or `lua/utils/`. No new or modified files
       under `tests/`. Verified by `git status` showing only new
       files in
       `context/cycles/03-config-deepening/issues/38-highlight-decomposition/42-closing-decomposition-audit/`
       and the new
       `context/cycles/03-config-deepening/issues/38-highlight-decomposition/aar.md`.
-- [ ] `./tests/run` exits 0 — re-confirmed in this sub-issue, even
+- [x] `./tests/run` exits 0 — re-confirmed in this sub-issue, even
       though no source changed, to certify the closing state.
-- [ ] `PATH=/usr/bin:/bin ./tests/run` exits 0 — re-confirmed.
-- [ ] Parent #38 issue.md's twelve `[ ]` ACs are now `[x]`.
+- [x] `PATH=/usr/bin:/bin ./tests/run` exits 0 — re-confirmed.
+- [x] Parent #38 issue.md's twelve `[ ]` ACs are now `[x]`.
       Verified by reading `issue.md` after the audit and ticking
       each box (the ticks are part of this sub-issue's diff).
 
