@@ -52,12 +52,14 @@ approach, flags).
 - [x] `solarized.setup()` calls `require("colors.os_theme").detect()` instead of
       the currently-inlined `get_os_theme` local function. The local
       `get_os_theme` is removed from `solarized.lua`. *(Done in #35.)*
-- [ ] The `VimEnter` and `FocusGained` solarized autocmds in
+- [x] The `VimEnter` and `FocusGained` solarized autocmds in
       `lua/config/autocmds.lua` are addressed: either retained with a one-line
       `desc` recording the reason (e.g. "trigger `os_theme.refresh()` on focus
       to detect system theme flips") or collapsed if subscribe + `os_theme`
       cache cover the observable behavior. Decision recorded in this parent's
       closing AAR. No other autocmd handler in `autocmds.lua` is touched.
+      *(Both retained with `desc`. FocusGained prepends `os_theme.refresh()`.
+      Done in #36.)*
 - [x] At least one passing unit test exists under `tests/colors/` exercising the
       subscribe contract: register a fake subscriber, call
       `solarized.set_theme("dark")` (with `vim.api.nvim_set_hl`, `vim.cmd`,
@@ -94,16 +96,16 @@ approach, flags).
       shape — `fn()` (no-arg, subscriber pulls `vim.o.background`) vs
       `fn(theme)` vs `fn(payload_table)`. Decided in first sub-issue (#33).
       *(C1: no-arg.)*
-- [ ] **Resolved-through-implementation decision recorded:** subscribe
+- [x] **Resolved-through-implementation decision recorded:** subscribe
       generalization (cycle PRD open question #3). Default expectation after
       this parent closes: scope strictly to `colors.solarized.subscribe`; no
       second consumer surfaced in cycle 03. Recorded in this parent's closing
-      AAR.
-- [ ] **Resolved-through-implementation decision recorded:** ADR-0004 candidate
+      AAR. *(Scoped strictly. No second consumer. Done in #36.)*
+- [x] **Resolved-through-implementation decision recorded:** ADR-0004 candidate
       for the subscribe-registry pattern (cycle PRD open question #4). Default
       expectation: defer to cycle 03 PRD close, where the family of seams
       (registrar from A, subscribe from B) may share an ADR. Recorded in this
-      parent's closing AAR.
+      parent's closing AAR. *(Deferred. Done in #36.)*
 
 ## Implementation approach
 

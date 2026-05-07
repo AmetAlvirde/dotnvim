@@ -252,19 +252,28 @@ co-located in `lua/config/commands_registrar.lua` (or as a local table in
 a second consumer during implementation, promotion to `lua/utils/` is warranted.
 Decide in A's first sub-issue, record in A's `issue.md`.
 
-### 3. Should B's subscribe registry generalize to a configuration-wide event bus? — `RESOLVE THROUGH IMPLEMENTATION`
+### 3. Should B's subscribe registry generalize to a configuration-wide event bus? — `RESOLVED: scope strictly`
 
 Tempting but speculative. The only known consumer today is lualine. If a second
 consumer surfaces during B's implementation (treesitter overrides, another
 statusline plugin, the sign column), generalize then. Otherwise scope strictly
 to `colors.solarized.subscribe`.
 
-### 4. ADR-0004 candidate for the subscribe-registry pattern? — `RESOLVE THROUGH IMPLEMENTATION`
+**Resolution (parent #32 / #36):** Scope strictly. Lualine remained the only
+consumer through all four of B's sub-issues. No generalization. Recorded in
+`issues/32-theme-subscribe-seam/aar.md`.
+
+### 4. ADR-0004 candidate for the subscribe-registry pattern? — `RESOLVED: deferred to PRD close`
 
 If B lands cleanly and a second consumer arrives in this cycle or the next, an
 ADR scoping the subscribe-registry shape (registry table, single emit point,
 idempotent unsubscribe) is warranted. Defer until B closes — premature ADRs
 codify guesses, per the ADR-0003 precedent from cycle 02.
+
+**Resolution (parent #32 / #36):** Deferred to cycle 03 PRD close. At that
+point evaluate whether registrar (#22) + subscribe (#33) + os_theme runner
+(#35) form a coherent "module-local seam with public setter" family warranting
+ADR-0004. Recorded in `issues/32-theme-subscribe-seam/aar.md`.
 
 ### 5. Highlight-section testing depth in C — `RESOLVE THROUGH IMPLEMENTATION`
 
