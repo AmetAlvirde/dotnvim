@@ -13,7 +13,7 @@ local T = MiniTest.new_set({
       _G.recorded_hls = {}
 
       -- Record every nvim_set_hl call (group → opts); last write wins per group,
-      -- which is the current observable behavior for the trailing manual block.
+      -- which is the current observable behavior for the single apply loop.
       vim.api.nvim_set_hl = function(_, group, opts)
         _G.recorded_hls[group] = opts
       end
@@ -27,12 +27,16 @@ local T = MiniTest.new_set({
       -- (carry-forward from #33's AAR).
       vim.o.background = "dark"
 
-      package.loaded["colors.solarized"]                  = nil
-      package.loaded["colors.highlights.lsp_diagnostic"]  = nil
-      package.loaded["colors.highlights.base"]             = nil
-      package.loaded["colors.highlights.syntax"]           = nil
-      package.loaded["colors.highlights.treesitter"]       = nil
-      package.loaded["colors.os_theme"]                   = nil
+      package.loaded["colors.solarized"]                       = nil
+      package.loaded["colors.highlights.lsp_diagnostic"]       = nil
+      package.loaded["colors.highlights.base"]                  = nil
+      package.loaded["colors.highlights.syntax"]                = nil
+      package.loaded["colors.highlights.treesitter"]            = nil
+      package.loaded["colors.highlights.markdown"]              = nil
+      package.loaded["colors.highlights.treesitter_markdown"]   = nil
+      package.loaded["colors.highlights.obsidian"]              = nil
+      package.loaded["colors.highlights.template_literals"]     = nil
+      package.loaded["colors.os_theme"]                        = nil
     end,
     post_case = function()
       vim.api.nvim_set_hl = _orig_set_hl
@@ -42,12 +46,16 @@ local T = MiniTest.new_set({
 
       _G.recorded_hls = nil
 
-      package.loaded["colors.solarized"]                  = nil
-      package.loaded["colors.highlights.lsp_diagnostic"]  = nil
-      package.loaded["colors.highlights.base"]             = nil
-      package.loaded["colors.highlights.syntax"]           = nil
-      package.loaded["colors.highlights.treesitter"]       = nil
-      package.loaded["colors.os_theme"]                   = nil
+      package.loaded["colors.solarized"]                       = nil
+      package.loaded["colors.highlights.lsp_diagnostic"]       = nil
+      package.loaded["colors.highlights.base"]                  = nil
+      package.loaded["colors.highlights.syntax"]                = nil
+      package.loaded["colors.highlights.treesitter"]            = nil
+      package.loaded["colors.highlights.markdown"]              = nil
+      package.loaded["colors.highlights.treesitter_markdown"]   = nil
+      package.loaded["colors.highlights.obsidian"]              = nil
+      package.loaded["colors.highlights.template_literals"]     = nil
+      package.loaded["colors.os_theme"]                        = nil
     end,
   },
 })
@@ -83,9 +91,9 @@ T["setup('light') applies all seven lsp_diagnostic groups"] = function()
   MiniTest.expect.equality(_G.recorded_hls["DiagnosticHint"].fg,    "#259d94")
 end
 
--- Probe: inlined rest table entries still reach the apply loop.
--- Normal and Comment have moved to section modules; markdownH1 remains inlined.
-T["setup('dark') applies a representative inlined entry"] = function()
+-- markdown section: markdownH1 is now owned by the markdown section module.
+-- Replaces the former "inlined rest" probe (markdownH1 has migrated out of rest).
+T["setup('dark') applies a markdown section entry"] = function()
   local solarized = require("colors.solarized")
   solarized.setup("dark")
 
@@ -94,13 +102,14 @@ T["setup('dark') applies a representative inlined entry"] = function()
   MiniTest.expect.equality(_G.recorded_hls["markdownH1"].bold, true)
 end
 
--- Trailing block: the imperative manual nvim_set_hl calls are preserved this sub-issue.
--- javaScriptStringT is overwritten by the trailing block: { fg = c.cyan, bg = c.bg1 }.
--- dark_colors: cyan="#259d94", bg1=base02="#093946".
-T["setup('dark') still applies the trailing manual block"] = function()
+-- template_literals section: javaScriptStringT is now owned by template_literals
+-- in its canonical final form (cyan/bg1). Replaces the former "trailing manual
+-- block" probe; the fold preserved the value, not the trailing-block phase.
+T["setup('dark') applies the template_literals canonical form for javaScriptStringT"] = function()
   local solarized = require("colors.solarized")
   solarized.setup("dark")
 
+  -- dark_colors: cyan="#259d94", bg1=base02="#093946"
   MiniTest.expect.equality(_G.recorded_hls["javaScriptStringT"].fg, "#259d94")
   MiniTest.expect.equality(_G.recorded_hls["javaScriptStringT"].bg, "#093946")
 end
@@ -130,6 +139,35 @@ T["setup('dark') applies a representative treesitter entry"] = function()
 
   MiniTest.expect.equality(_G.recorded_hls["@function"].fg,       "#2b90d8")
   MiniTest.expect.equality(_G.recorded_hls["@text.strong"].bold,  true)
+end
+
+-- treesitter_markdown section: @markdown.heading owned by treesitter_markdown module.
+T["setup('dark') applies a representative treesitter_markdown entry"] = function()
+  local solarized = require("colors.solarized")
+  solarized.setup("dark")
+
+  -- dark_colors: blue="#2b90d8"
+  MiniTest.expect.equality(_G.recorded_hls["@markdown.heading"].fg,   "#2b90d8")
+  MiniTest.expect.equality(_G.recorded_hls["@markdown.heading"].bold, true)
+end
+
+-- obsidian section: markdownWikiLink owned by obsidian module.
+T["setup('dark') applies a representative obsidian entry"] = function()
+  local solarized = require("colors.solarized")
+  solarized.setup("dark")
+
+  -- dark_colors: violet="#7d80d1"
+  MiniTest.expect.equality(_G.recorded_hls["markdownWikiLink"].fg,        "#7d80d1")
+  MiniTest.expect.equality(_G.recorded_hls["markdownWikiLink"].underline,  true)
+end
+
+-- template_literals section: htmlTag owned by template_literals module.
+T["setup('dark') applies a representative template_literals entry"] = function()
+  local solarized = require("colors.solarized")
+  solarized.setup("dark")
+
+  -- dark_colors: magenta="#dd459d"
+  MiniTest.expect.equality(_G.recorded_hls["htmlTag"].fg, "#dd459d")
 end
 
 return T
