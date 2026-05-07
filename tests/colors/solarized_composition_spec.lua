@@ -29,6 +29,9 @@ local T = MiniTest.new_set({
 
       package.loaded["colors.solarized"]                  = nil
       package.loaded["colors.highlights.lsp_diagnostic"]  = nil
+      package.loaded["colors.highlights.base"]             = nil
+      package.loaded["colors.highlights.syntax"]           = nil
+      package.loaded["colors.highlights.treesitter"]       = nil
       package.loaded["colors.os_theme"]                   = nil
     end,
     post_case = function()
@@ -41,6 +44,9 @@ local T = MiniTest.new_set({
 
       package.loaded["colors.solarized"]                  = nil
       package.loaded["colors.highlights.lsp_diagnostic"]  = nil
+      package.loaded["colors.highlights.base"]             = nil
+      package.loaded["colors.highlights.syntax"]           = nil
+      package.loaded["colors.highlights.treesitter"]       = nil
       package.loaded["colors.os_theme"]                   = nil
     end,
   },
@@ -78,16 +84,14 @@ T["setup('light') applies all seven lsp_diagnostic groups"] = function()
 end
 
 -- Probe: inlined rest table entries still reach the apply loop.
--- Normal and Comment remain in the inlined intermediate table this sub-issue.
+-- Normal and Comment have moved to section modules; markdownH1 remains inlined.
 T["setup('dark') applies a representative inlined entry"] = function()
   local solarized = require("colors.solarized")
   solarized.setup("dark")
 
-  -- dark_colors: fg0="#98a8a8", bg0="#002d38", fg2="#657377"
-  MiniTest.expect.equality(_G.recorded_hls["Normal"].fg, "#98a8a8")
-  MiniTest.expect.equality(_G.recorded_hls["Normal"].bg, "#002d38")
-  MiniTest.expect.equality(_G.recorded_hls["Comment"].fg, "#657377")
-  MiniTest.expect.equality(_G.recorded_hls["Comment"].italic, true)
+  -- dark_colors: blue="#2b90d8"
+  MiniTest.expect.equality(_G.recorded_hls["markdownH1"].fg,   "#2b90d8")
+  MiniTest.expect.equality(_G.recorded_hls["markdownH1"].bold, true)
 end
 
 -- Trailing block: the imperative manual nvim_set_hl calls are preserved this sub-issue.
@@ -99,6 +103,33 @@ T["setup('dark') still applies the trailing manual block"] = function()
 
   MiniTest.expect.equality(_G.recorded_hls["javaScriptStringT"].fg, "#259d94")
   MiniTest.expect.equality(_G.recorded_hls["javaScriptStringT"].bg, "#093946")
+end
+
+-- base section: StatusLine uses fg1 (base1="#8faaab") and bg1 (base02="#093946") in dark.
+T["setup('dark') applies a representative base entry"] = function()
+  local solarized = require("colors.solarized")
+  solarized.setup("dark")
+
+  MiniTest.expect.equality(_G.recorded_hls["StatusLine"].fg, "#8faaab")
+  MiniTest.expect.equality(_G.recorded_hls["StatusLine"].bg, "#093946")
+end
+
+-- syntax section: Comment uses fg2 (base00="#657377") in dark, italic=true.
+T["setup('dark') applies a representative syntax entry"] = function()
+  local solarized = require("colors.solarized")
+  solarized.setup("dark")
+
+  MiniTest.expect.equality(_G.recorded_hls["Comment"].fg,     "#657377")
+  MiniTest.expect.equality(_G.recorded_hls["Comment"].italic, true)
+end
+
+-- treesitter section: @function uses blue="#2b90d8"; @text.strong is bold.
+T["setup('dark') applies a representative treesitter entry"] = function()
+  local solarized = require("colors.solarized")
+  solarized.setup("dark")
+
+  MiniTest.expect.equality(_G.recorded_hls["@function"].fg,       "#2b90d8")
+  MiniTest.expect.equality(_G.recorded_hls["@text.strong"].bold,  true)
 end
 
 return T

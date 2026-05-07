@@ -101,6 +101,9 @@ M.light_colors = light_colors
 
 local SECTIONS = {
   "colors.highlights.lsp_diagnostic",
+  "colors.highlights.base",
+  "colors.highlights.syntax",
+  "colors.highlights.treesitter",
 }
 
 -- Function to apply colorscheme
@@ -119,118 +122,9 @@ function M.setup(theme_override)
   end
 
   -- Intermediate inlined table (shrinks as sections are extracted):
+  -- Remaining: HTML/template-literal block, markdown* legacy groups,
+  -- @markdown.* groups, and Obsidian extensions (~120 entries).
   local rest = {
-    -- Basic colors
-    Normal = { fg = c.fg0, bg = c.bg0 },
-    NormalFloat = { fg = c.fg0, bg = c.bg1 },
-    NormalNC = { fg = c.fg0, bg = c.bg0 },
-    
-    -- Cursor
-    Cursor = { fg = c.bg0, bg = c.fg0 },
-    CursorLine = { bg = c.bg1 },
-    CursorColumn = { bg = c.bg1 },
-    CursorLineNr = { fg = c.fg2, bg = c.bg1 },
-    
-    -- Line numbers
-    LineNr = { fg = c.fg2 },
-    LineNrAbove = { fg = c.fg2 },
-    LineNrBelow = { fg = c.fg2 },
-    
-    -- Status line
-    StatusLine = { fg = c.fg1, bg = c.bg1 },
-    StatusLineNC = { fg = c.fg2, bg = c.bg1 },
-    StatusLineTerm = { fg = c.fg1, bg = c.bg1 },
-    StatusLineTermNC = { fg = c.fg2, bg = c.bg1 },
-    
-    -- Tab line
-    TabLine = { fg = c.fg2, bg = c.bg1 },
-    TabLineFill = { bg = c.bg1 },
-    TabLineSel = { fg = c.fg0, bg = c.bg0 },
-    
-    -- Windows
-    WinSeparator = { fg = c.fg2 },
-    VertSplit = { fg = c.fg2 },
-    
-    -- Search
-    Search = { fg = c.yellow, bg = c.bg2 },
-    IncSearch = { fg = c.orange, bg = c.bg2 },
-    CurSearch = { fg = c.orange, bg = c.bg2 },
-    
-    -- Visual
-    Visual = { bg = c.bg2 },
-    VisualNOS = { bg = c.bg2 },
-    
-    -- Diff
-    DiffAdd = { fg = c.green, bg = c.bg1 },
-    DiffChange = { fg = c.yellow, bg = c.bg1 },
-    DiffDelete = { fg = c.red, bg = c.bg1 },
-    DiffText = { fg = c.blue, bg = c.bg1 },
-    
-    -- Folding
-    Folded = { fg = c.fg2, bg = c.bg1 },
-    FoldColumn = { fg = c.fg2, bg = c.bg0 },
-    
-    -- Sign column
-    SignColumn = { fg = c.fg2, bg = c.bg0 },
-    
-    -- Color column (80-character line)
-    ColorColumn = { bg = c.bg1 },
-    
-    -- Menu
-    Pmenu = { fg = c.fg0, bg = c.bg1 },
-    PmenuSel = { fg = c.bg0, bg = c.fg0 },
-    PmenuSbar = { bg = c.bg1 },
-    PmenuThumb = { bg = c.fg2 },
-    
-    -- Messages
-    ErrorMsg = { fg = c.red, bg = c.bg0 },
-    WarningMsg = { fg = c.yellow, bg = c.bg0 },
-    ModeMsg = { fg = c.fg0, bg = c.bg0 },
-    MoreMsg = { fg = c.blue, bg = c.bg0 },
-    Question = { fg = c.cyan, bg = c.bg0 },
-    
-    -- Syntax highlighting
-    Comment = { fg = c.fg2, italic = true },
-    Constant = { fg = c.cyan },
-    String = { fg = c.cyan },
-    Character = { fg = c.cyan },
-    Number = { fg = c.cyan },
-    Boolean = { fg = c.cyan },
-    Float = { fg = c.cyan },
-    
-    Identifier = { fg = c.blue },
-    Function = { fg = c.blue },
-    
-    Statement = { fg = c.green },
-    Conditional = { fg = c.green },
-    Repeat = { fg = c.green },
-    Label = { fg = c.green },
-    Operator = { fg = c.green },
-    Keyword = { fg = c.green },
-    Exception = { fg = c.green },
-    
-    PreProc = { fg = c.orange },
-    Include = { fg = c.orange },
-    Define = { fg = c.orange },
-    Macro = { fg = c.orange },
-    PreCondit = { fg = c.orange },
-    
-    Type = { fg = c.yellow },
-    StorageClass = { fg = c.yellow },
-    Structure = { fg = c.yellow },
-    Typedef = { fg = c.yellow },
-    
-    Special = { fg = c.magenta },
-    SpecialChar = { fg = c.magenta },
-    Tag = { fg = c.magenta },
-    Delimiter = { fg = c.magenta },
-    SpecialComment = { fg = c.magenta },
-    Debug = { fg = c.magenta },
-    
-    Underlined = { underline = true },
-    Bold = { bold = true },
-    Italic = { italic = true },
-    
     -- HTML Template Literals
     javaScriptStringT = { fg = c.yellow },
     htmlTag = { fg = c.magenta },
@@ -243,79 +137,6 @@ function M.setup(theme_override)
     htmlBold = { bold = true },
     htmlItalic = { italic = true },
     htmlUnderline = { underline = true },
-    
-    -- Treesitter
-    ["@comment"] = { fg = c.fg2, italic = true },
-    ["@string"] = { fg = c.cyan },
-    ["@number"] = { fg = c.cyan },
-    ["@boolean"] = { fg = c.cyan },
-    ["@function"] = { fg = c.blue },
-    ["@function.builtin"] = { fg = c.blue },
-    ["@function.macro"] = { fg = c.blue },
-    ["@parameter"] = { fg = c.fg0 },
-    ["@parameter.reference"] = { fg = c.fg0 },
-    ["@method"] = { fg = c.blue },
-    ["@field"] = { fg = c.fg0 },
-    ["@property"] = { fg = c.fg0 },
-    ["@constructor"] = { fg = c.yellow },
-    ["@conditional"] = { fg = c.green },
-    ["@repeat"] = { fg = c.green },
-    ["@label"] = { fg = c.green },
-    ["@keyword"] = { fg = c.green },
-    ["@operator"] = { fg = c.green },
-    ["@keyword.function"] = { fg = c.green },
-    ["@keyword.operator"] = { fg = c.green },
-    ["@keyword.return"] = { fg = c.green },
-    ["@exception"] = { fg = c.green },
-    ["@type"] = { fg = c.yellow },
-    ["@type.builtin"] = { fg = c.yellow },
-    ["@type.qualifier"] = { fg = c.yellow },
-    ["@type.definition"] = { fg = c.yellow },
-    ["@storageclass"] = { fg = c.yellow },
-    ["@attribute"] = { fg = c.orange },
-    ["@field"] = { fg = c.fg0 },
-    ["@property"] = { fg = c.fg0 },
-    ["@variable"] = { fg = c.fg0 },
-    ["@variable.builtin"] = { fg = c.orange },
-    ["@constant"] = { fg = c.cyan },
-    ["@constant.builtin"] = { fg = c.cyan },
-    ["@constant.macro"] = { fg = c.cyan },
-    ["@namespace"] = { fg = c.fg0 },
-    ["@symbol"] = { fg = c.magenta },
-    ["@text"] = { fg = c.fg0 },
-    ["@text.strong"] = { bold = true },
-    ["@text.emphasis"] = { italic = true },
-    ["@text.underline"] = { underline = true },
-    ["@text.title"] = { fg = c.blue, bold = true },
-    ["@text.literal"] = { fg = c.cyan },
-    ["@text.uri"] = { fg = c.blue, underline = true },
-    ["@text.math"] = { fg = c.magenta },
-    ["@text.reference"] = { fg = c.blue },
-    ["@text.environment"] = { fg = c.orange },
-    ["@text.environment.name"] = { fg = c.orange },
-    ["@text.note"] = { fg = c.cyan },
-    ["@text.warning"] = { fg = c.yellow },
-    ["@text.danger"] = { fg = c.red },
-    ["@tag"] = { fg = c.magenta },
-    ["@tag.delimiter"] = { fg = c.fg2 },
-    ["@tag.attribute"] = { fg = c.orange },
-    ["@punctuation"] = { fg = c.fg2 },
-    ["@punctuation.bracket"] = { fg = c.fg2 },
-    ["@punctuation.delimiter"] = { fg = c.fg2 },
-    ["@punctuation.special"] = { fg = c.magenta },
-    
-    -- Rainbow brackets highlight groups
-    RainbowDelimiterRed = { fg = c.red },
-    RainbowDelimiterYellow = { fg = c.yellow },
-    RainbowDelimiterBlue = { fg = c.blue },
-    RainbowDelimiterOrange = { fg = c.orange },
-    RainbowDelimiterGreen = { fg = c.green },
-    RainbowDelimiterViolet = { fg = c.violet },
-    RainbowDelimiterCyan = { fg = c.cyan },
-    ["@macro"] = { fg = c.orange },
-    ["@define"] = { fg = c.orange },
-    ["@include"] = { fg = c.orange },
-    ["@preproc"] = { fg = c.orange },
     
     -- Markdown syntax highlighting
     markdownH1 = { fg = c.blue, bold = true },
