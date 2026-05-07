@@ -12,6 +12,7 @@ With this configuration, you get an nvim environment with:
 - **Custom Solarized Theme**: Beautiful light/dark theme with automatic OS detection
 - **Web Development Focus**: Optimized for React, Lit, web components, and modern frameworks
 - **Obsidian Integration**: Complete note-taking workflow with custom templates
+- **Obsidian CLI Commands**: Quickfix-first vault tooling for tasks, links, history, and stats
 - **IntelliSense-like Experience**: Full LSP support with TypeScript/JavaScript
 - **Git Integration**: Comprehensive git workflow with multiple tools
 - **Developer Experience**: Carefully tuned settings, autopairs, rainbow delimiters, etc.
@@ -41,6 +42,15 @@ With this configuration, you get an nvim environment with:
 - **Custom Note Templates**: Automatic frontmatter generation with timestamps
 - **Link Navigation**: Follow and create Obsidian links
 - **Search Integration**: Full-text search within your vault
+- **CLI-Powered Workflows**: Native commands for tasks, backlinks, orphans/deadends, history diffing, and bookmarks
+
+### Custom Commands
+
+The config ships with user commands beyond plugin defaults:
+
+- **Theme commands**: `:SolarizedToggle`, `:SolarizedDark`, `:SolarizedLight`, `:LualineRefresh`
+- **Obsidian CLI commands**: `:ObsCLITasks`, `:ObsCLITaskToggle`, `:ObsCLIOrphans`, `:ObsCLIDeadends`, `:ObsCLIUnresolved`, `:ObsCLISearchContext`, `:ObsCLIHistory`, `:ObsCLIHistoryRead`, `:ObsCLIDiffFrom`, `:ObsCLIOutline`, `:ObsCLIBacklinks`, `:ObsCLIWordCount`, `:ObsCLIBookmarks`, `:ObsCLIBookmarkAdd`
+- **Word count**: `:WordCount` (supports ranges like `:%WordCount` and visual range)
 
 ### Navigation & Search
 
@@ -83,6 +93,8 @@ With this configuration, you get an nvim environment with:
 ## Keymaps
 
 All keymaps follow a **mnemonic namespace strategy**: every `<leader>` key sequence starts with a prefix that names its domain, so the mapping reads like a sentence. See [docs/keymaps.md](docs/keymaps.md) for the full reference.
+
+For a quick command reference (non-keymap actions), see `lua/config/commands.lua`.
 
 | Prefix | Domain |
 |--------|--------|
