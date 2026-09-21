@@ -9,7 +9,7 @@
 #
 # Usage:
 #   ./scripts/obsidian-vault-health-report.sh [--stdout | --write[=PATH]] [--vault=NAME]
-#   OBSIDIAN_VAULT=cronicasDeUnCorredorComoTu ./scripts/obsidian-vault-health-report.sh --stdout
+#   OBSIDIAN_VAULT=conscium ./scripts/obsidian-vault-health-report.sh --stdout
 #
 # Output modes:
 #   --stdout             Print report to stdout (default).
@@ -35,7 +35,7 @@ Options:
   --stdout             Print report to stdout (default)
   --write[=PATH]       Write report to PATH. If PATH is omitted, write to:
                        ./vault-health-YYYY-MM-DD.md
-  --vault=NAME         Vault key: conscium | cronicasDeUnCorredorComoTu (see lua/config/vaults.lua)
+  --vault=NAME         Vault key: conscium (see lua/config/vaults.lua)
   -h, --help           Show help
 
   OBSIDIAN_VAULT_ROOT=/abs/path      Use this vault directory (overrides --vault path lookup)
@@ -74,7 +74,8 @@ done
 resolve_vault_root() {
   case "$VAULT_NAME" in
     conscium) echo "/Users/amet/Writing/conscium" ;;
-    cronicasDeUnCorredorComoTu) echo "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu" ;;
+    # Vault removed; restore when a replacement path exists.
+    # cronicasDeUnCorredorComoTu) echo "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu" ;;
     *) echo "" ;;
   esac
 }
@@ -82,7 +83,7 @@ resolve_vault_root() {
 VAULT_ROOT="${OBSIDIAN_VAULT_ROOT:-$(resolve_vault_root)}"
 if [[ -z "$VAULT_ROOT" || ! -d "$VAULT_ROOT" ]]; then
   echo "obsidian-vault-health-report: unknown vault name '${VAULT_NAME}' or missing directory." >&2
-  echo "Use conscium or cronicasDeUnCorredorComoTu, or set OBSIDIAN_VAULT_ROOT to the vault folder." >&2
+  echo "Use conscium, or set OBSIDIAN_VAULT_ROOT to the vault folder." >&2
   exit 1
 fi
 

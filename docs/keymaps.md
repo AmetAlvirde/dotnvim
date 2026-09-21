@@ -142,7 +142,8 @@ All git tooling lives under `<leader>g`, grouped by sub-namespace.
 | Key          | Action                                     |
 | ------------ | ------------------------------------------ |
 | `<leader>oc` | Enter conscium workspace                   |
-| `<leader>or` | Enter cronicasDeUnCorredorComoTu workspace |
+<!-- Vault removed; restore when a replacement path exists. -->
+<!-- | `<leader>or` | Enter cronicasDeUnCorredorComoTu workspace | -->
 
 #### Notes
 

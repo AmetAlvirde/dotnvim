@@ -185,7 +185,8 @@ end
 -- Global keybindings to enter Obsidian workspaces
 keymap('n', '<leader>oc', function() enter_obsidian_workspace('conscium') end, { desc = 'Enter conscium workspace' })
 -- keymap('n', '<leader>oa', function() enter_obsidian_workspace('AmetAlvirde') end, { desc = 'Enter AmetAlvirde workspace' })
-keymap('n', '<leader>or', function() enter_obsidian_workspace('cronicasDeUnCorredorComoTu') end, { desc = 'Enter cronicasDeUnCorredorComoTu workspace' })
+-- Vault removed; restore when a replacement path exists.
+-- keymap('n', '<leader>or', function() enter_obsidian_workspace('cronicasDeUnCorredorComoTu') end, { desc = 'Enter cronicasDeUnCorredorComoTu workspace' })
 
 -- ===================================================
 -- Obsidian Commands (Global Keymaps)

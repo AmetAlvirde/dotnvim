@@ -11,16 +11,17 @@ M.vaults = {
     name = "conscium",
     path = "/Users/amet/Writing/conscium",
   },
-  cronicasDeUnCorredorComoTu = {
-    name = "cronicasDeUnCorredorComoTu",
-    path = "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
-  },
+  -- Vault removed; restore when a replacement path exists.
+  -- cronicasDeUnCorredorComoTu = {
+  --   name = "cronicasDeUnCorredorComoTu",
+  --   path = "/Users/amet/2025/work/mycelium/cronicas-de-un-corredor-como-tu",
+  -- },
 }
 
 -- obsidian.nvim expects an array of { name, path }.
 M.workspaces = {
   { name = M.vaults.conscium.name, path = M.vaults.conscium.path },
-  { name = M.vaults.cronicasDeUnCorredorComoTu.name, path = M.vaults.cronicasDeUnCorredorComoTu.path },
+  -- { name = M.vaults.cronicasDeUnCorredorComoTu.name, path = M.vaults.cronicasDeUnCorredorComoTu.path },
 }
 
 function M.get(name)
